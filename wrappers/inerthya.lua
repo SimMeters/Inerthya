@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------------------------------------------------
 -- Copyright(c) 2016, SimMeters.com
 -- All rights reserved. Released under the BSD license.
--- INERTHYA.lua 1.0 01/10/2015 (INERTHYA Protocol LUA Implementation)
+-- inerthya.lua 1.0 01/10/2015 (INERTHYA Protocol LUA Implementation)
 
 -- Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
 -- following conditions are met:
