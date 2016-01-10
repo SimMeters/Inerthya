@@ -2,10 +2,10 @@
 -- Copyright(c) 2014 SimMeters.com. All Rights Reserved.
 -- adi_0000.jal 1.0 01/01/2014 (Attitude Indicator 2 Servos RC on PORTA0 and PORTA1)
 ------------------------------------------------------------------------------------------------------------------------
-include canaerospace 	-- Constants for CANAerospace
-include lru0002       	-- Include For LRU Device Type
-include canbus       	-- CanBus Library
-include objects      	-- Objects Library
+include canaerospace -- Constants for CANAerospace
+include lru0002       -- Include For LRU Device Type
+include canbus       -- CanBus Library
+include objects      -- Objects Library
 
 ------------------------------------------------------------------------------------------------------------------------
 -- Initialization
