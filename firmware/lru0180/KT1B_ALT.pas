@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------------------------------------------
--- Copyright (c) 2015, SimMeters
+-- Copyright (c) 2015, SimMeters.com
 -- All rights reserved. Released under the BSD license.
 -- KT1B_ALT.jal 1.0 01/01/2015 (KT1B Digital Altimeter 3Digit 80MM)
 
@@ -63,7 +63,6 @@ dsta = 0
 
 setup_can_init()
 add_can_rxfilter(id_request_bootloader)
-add_can_rxfilter(id_lamps_0_31)
 add_can_rxfilter(id_baro_correction)
 add_can_rxfilter(id_baro_corrected_altitude)
 setup_can_end()
@@ -118,55 +117,46 @@ end procedure
 ------------------------------------------------------------------------------------------------------------------------
 forever loop 
     
-    opaque_text(true)
-    adjust_vid2905()
-    request_bootloader("KT1B_ALT")
+    	opaque_text(true)
+    	adjust_vid2905()
+    	request_bootloader("KT1B_ALT")
+	
+	cf = get_can_frame(id_baro_correction)
+    	if(cf.dlc > 0) then
 
-    cf = get_can_frame(id_lamps_0_31)
-    if(cf.dlc > 0) then
-    
-        led_l = ((get_can_uint32(cf) & mask_lamp_00) != 0)
-        led_r = ((get_can_uint32(cf) & mask_lamp_00) != 0)
-    
-    end if
-
-    cf = get_can_frame(id_baro_correction)
-    if(cf.dlc > 0) then
-
-         qnh = get_can_float(cf) * float(2.9536)
-         vqnh = dword(qnh)
-         
-         if(vqnh != vqnhl) then
-            
+        	qnh = get_can_float(cf) * float(2.9536)
+        	vqnh = dword(qnh)
+         	
+         	if(vqnh != vqnhl) then
 			vqnhl = vqnh
-            print_inhg(0x04, 0x06, 0x01, 0xFF, 0xFF, vqnh)
-         
+            		print_inhg(0x04, 0x06, 0x01, 0xFF, 0xFF, vqnh)
 		 end if
 
-    end if    
+    	end if    
     
 	cf = get_can_frame(id_baro_corrected_altitude)
-    if(cf.dlc > 0) then
+    	if(cf.dlc > 0) then
     
-        alt = get_can_float(cf) * float(3.2808)
+        	led_l 	= cf.data2
+        	led_r 	= led_l
+        	alt 	= get_can_float(cf) * float(3.2808)
 
-        if (alt >= float(0) & alt <= float(60000)) then
+        	if (alt >= float(0) & alt <= float(60000)) then
         
-            dsta = dword(alt * float(8.64)) % 8640
-
-            if ((srca > dsta) & ((srca - dsta) > 4320)) then
-                dsta = dsta + 8640
-            elsif ((srca < dsta) & ((dsta - srca) > 4320)) then
-                srca = srca + 8640
-            end if                    
+            		dsta = dword(alt * float(8.64)) % 8640
+            		if ((srca > dsta) & ((srca - dsta) > 4320)) then
+                		dsta = dsta + 8640
+            		elsif ((srca < dsta) & ((dsta - srca) > 4320)) then
+                		srca = srca + 8640
+            		end if                    
             
-            print_alt3(0x02, 0x02, 0x02, 0xFF, 0xFF, dword(alt))
+            		print_alt3(0x02, 0x02, 0x02, 0xFF, 0xFF, dword(alt))
 
-            set_vid2905()
-            srca = srca % 8640
+            		set_vid2905()
+            		srca = srca % 8640
 
-        end if
+        	end if
 
-    end if    
+	end if    
 
 end loop
