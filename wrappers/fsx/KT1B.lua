@@ -37,7 +37,7 @@
 --require ("EngSnd")
 --require ("complex") --
 --require ("dsp") --
-dofile("INERTHYA.lua") -- SimMeters INERTHYA System LUA Implementation
+dofile("inerthya.lua") -- SimMeters INERTHYA System LUA Implementation
 
 ------------------------------------------------------------------------------------------------------------------------
 -- Network Configuration
