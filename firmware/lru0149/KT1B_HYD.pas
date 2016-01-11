@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------------------------------------------
--- Copyright (c) 2015, SimMeters.
+-- Copyright (c) 2015, SimMeters.com
 -- All rights reserved. Released under the BSD license.
 -- KT1B_HYD.jal 1.0 01/01/2015 (Hydraulic Pressure Indicator 49MM)
 
@@ -20,7 +20,6 @@
 -- WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
 -- USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ------------------------------------------------------------------------------------------------------------------------
-include atachapters  -- Library for ATA Chapters constants
 include canaerospace -- Library for CAN Aerospace constants
 include lru0149      -- Include For LRU Gauge Device Type
 include canbus       -- Library for CANBus
@@ -50,7 +49,6 @@ dsta = 0
 
 setup_can_init()
 add_can_rxfilter(id_request_bootloader)
---add_can_rxfilter(id_lamps_0_31)
 add_can_rxfilter(id_hydraulic_system_1_pressure)
 setup_can_end()
 
@@ -63,18 +61,12 @@ led_r = off
 forever loop
 
     request_bootloader("KT1B_HYD")
-	
-    --cf = get_can_frame(id_lamps_0_31)
-    --if(cf.dlc > 0) then
-    
-        --led_l = ((get_can_uint32(cf) & mask_lamp_00) != 0)
-        --led_r = ((get_can_uint32(cf) & mask_lamp_00) != 0)
-    
-    --end if
 
     cf = get_can_frame(id_hydraulic_system_1_pressure)
     if(cf.dlc > 0) then
 
+	led_l 	= cf.data2
+        led_r 	= led_l       
         hyd = get_can_float(cf)
 
         if (hyd <= float(0)) then
