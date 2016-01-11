@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------------------------------------------------
--- Copyright (c) 2015, SimMeters.
+-- Copyright (c) 2016, SimMeters.com
 -- All rights reserved. Released under the BSD license.
--- KT1B_FLP.jal 1.0 01/01/2015 (KT1B Display Flap Indicator)
+-- KT1B_FLP.jal 1.0 01/01/2016 (KT1B Display Flap Indicator)
 
 -- Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
 -- following conditions are met:
@@ -78,28 +78,28 @@ forever loop
 
         if(flp_lat != flp) then
 			
-			flp_lat = flp
-            opaque_text(true)	        
+		flp_lat = flp
+            	opaque_text(true)	        
 	        
-            case flp_lat of
+            	case flp_lat of
             
-                1: block 
-                    prints(0x01, 0x01, 0x00, 0xFF, 0xFF, FLAP_UP)
-                end block
+                	1: block 
+                    		prints(0x01, 0x01, 0x00, 0xFF, 0xFF, FLAP_UP)
+                	end block
             
-                2: block 
-                    prints(0x01, 0x01, 0x00, 0xFF, 0xFF, FLAP_TO)
-                end block
+                	2: block 
+                    		prints(0x01, 0x01, 0x00, 0xFF, 0xFF, FLAP_TO)
+                	end block
 
-                3: block 
-                    prints(0x01, 0x01, 0x00, 0xFF, 0xFF, FLAP_LD)
-                end block
+                	3: block 
+                    		prints(0x01, 0x01, 0x00, 0xFF, 0xFF, FLAP_LD)
+                	end block
 
-                4: block 
-                    prints(0x01, 0x01, 0x00, 0xFF, 0xFF, FLAP_BP)
-                end block
+                	4: block 
+                    		prints(0x01, 0x01, 0x00, 0xFF, 0xFF, FLAP_BP)
+                	end block
 
-            end case
+            	end case
 
         end if
 
