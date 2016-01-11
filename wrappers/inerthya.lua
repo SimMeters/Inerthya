@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------------------------------------------------
 -- Copyright(c) 2016, SimMeters.com
 -- All rights reserved. Released under the BSD license.
--- inerthya.lua 1.0 01/10/2015 (INERTHYA Protocol LUA Implementation)
+-- inerthya.lua 1.0 01/01/2016 (INERTHYA Protocol LUA Implementation)
 
 -- Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
 -- following conditions are met:
@@ -37,71 +37,71 @@
 -- CAN Aerospace V1.7 Constants and Functions
 -- CAN Aerospace V1.7 NODES
 ------------------------------------------------------------------------------------------------------------------------
-NODE_AHRS 		= 0x01
-NODE_ADC 		= 0x02
-NODE_VHF1 		= 0x03
-NODE_VHF2 		= 0x04
-NODE_NAVILS1    = 0x05
-NODE_NAVILS2    = 0x06
-NODE_ATC 		= 0x07
-NODE_ADF 		= 0x08
-NODE_GPS 		= 0x0A
-NODE_DME 		= 0x0B
-NODE_EMS 		= 0x0C
-NODE_ETS 		= 0x0D
-NODE_ES 		= 0x0E
-NODE_WCS 		= 0x0F
+NODE_AHRS	= 0x01
+NODE_ADC	= 0x02
+NODE_VHF1	= 0x03
+NODE_VHF2 	= 0x04
+NODE_NAVILS1	= 0x05
+NODE_NAVILS2	= 0x06
+NODE_ATC	= 0x07
+NODE_ADF	= 0x08
+NODE_GPS	= 0x0A
+NODE_DME	= 0x0B
+NODE_EMS	= 0x0C
+NODE_ETS	= 0x0D
+NODE_ES		= 0x0E
+NODE_WCS	= 0x0F
 
 ------------------------------------------------------------------------------------------------------------------------
 -- CAN Aerospace V1.7 DATA TYPES
 ------------------------------------------------------------------------------------------------------------------------
-TYPE_NODATA		= 0x00
-TYPE_ERROR 		= 0x01
-TYPE_FLOAT 		= 0x02
-TYPE_LONG 		= 0x03
-TYPE_ULONG 		= 0x04
-TYPE_BLONG 		= 0x05
-TYPE_SHORT 		= 0x06
-TYPE_USHORT     = 0x07
-TYPE_BSHORT     = 0x08
-TYPE_CHAR 		= 0x09
-TYPE_UCHAR 		= 0x0A
-TYPE_BCHAR 		= 0x0B
+TYPE_NODATA	= 0x00
+TYPE_ERROR	= 0x01
+TYPE_FLOAT	= 0x02
+TYPE_LONG	= 0x03
+TYPE_ULONG	= 0x04
+TYPE_BLONG	= 0x05
+TYPE_SHORT	= 0x06
+TYPE_USHORT	= 0x07
+TYPE_BSHORT	= 0x08
+TYPE_CHAR	= 0x09
+TYPE_UCHAR	= 0x0A
+TYPE_BCHAR	= 0x0B
 TYPE_SHORT2     = 0x0C
 TYPE_USHORT2    = 0x0D
 TYPE_BSHORT2    = 0x0E
-TYPE_CHAR4 		= 0x0F
+TYPE_CHAR4	= 0x0F
 TYPE_UCHAR4     = 0x10
 TYPE_BCHAR4     = 0x11
-TYPE_CHAR2 		= 0x12
+TYPE_CHAR2	= 0x12
 TYPE_UCHAR2     = 0x13
 TYPE_BCHAR2     = 0x14
-TYPE_MEMID 		= 0x15
+TYPE_MEMID	= 0x15
 TYPE_CHKSUM     = 0x16
-TYPE_ACHAR 		= 0x17
+TYPE_ACHAR	= 0x17
 TYPE_ACHAR2     = 0x18
 TYPE_ACHAR4     = 0x19
-TYPE_CHAR3 		= 0x1A
+TYPE_CHAR3	= 0x1A
 TYPE_UCHAR3     = 0x1B
 TYPE_BCHAR3     = 0x1C
 TYPE_ACHAR3     = 0x1D
 TYPE_DOUBLEH    = 0x1E
 TYPE_DOUBLEL    = 0x1F
-TYPE_RESVD 		= 0x20
-TYPE_UDEF 		= 0x64
+TYPE_RESVD	= 0x20
+TYPE_UDEF	= 0x64
 
 ------------------------------------------------------------------------------------------------------------------------
 -- CAN Aerospace V1.7 SERVICE CODES
 ------------------------------------------------------------------------------------------------------------------------
-SC0 			= 0x00
-SC1 			= 0x01
-SC2 			= 0x02
-SC3 			= 0x03
-SC4 			= 0x04
-SC5 			= 0x05
-SC6 			= 0x06
-SC7 			= 0x07
-SC8 			= 0x08
+SC0 		= 0x00
+SC1 		= 0x01
+SC2 		= 0x02
+SC3 		= 0x03
+SC4 		= 0x04
+SC5 		= 0x05
+SC6 		= 0x06
+SC7 		= 0x07
+SC8 		= 0x08
 
 ------------------------------------------------------------------------------------------------------------------------
 -- CAN Aerospace V1.7 CAN ID's
@@ -664,31 +664,33 @@ end
 -- genMessageCode
 ------------------------------------------------------------------------------------------------------------------------
 function genMessageCode(can_id)
+	
 	if MESSAGE_CODE_IDX[can_id] ~= nil then
 		MESSAGE_CODE_IDX[can_id] = math.floor(MESSAGE_CODE_IDX[can_id] + 1) % 256
 	else
 		MESSAGE_CODE_IDX[can_id] = 0
 	end
 	return MESSAGE_CODE_IDX[can_id]
+
 end
 
 ------------------------------------------------------------------------------------------------------------------------
 -- packFloat
 ------------------------------------------------------------------------------------------------------------------------
 function packFloat(can_id, node_id, service_code, val)
-	
+
 	local sign = 0
-    local v, byte = ""
-    if val < 0 then sign = 1; val = -val end
-    local mantissa, exponent = math.frexp(val)
-    if val == 0 then mantissa = 0; exponent = 0 else
-        mantissa = (mantissa * 2 - 1) * math.ldexp(0.5, 24)
-        exponent = exponent + 126
-    end
-    val, byte = ShortToBytes(mantissa); v = v..byte
-    val, byte = ShortToBytes(val); v = v..byte
-    val, byte = ShortToBytes(exponent * 128 + val); v = v..byte
-    val, byte = ShortToBytes(sign * 128 + val); v = v..byte
+    	local v, byte = ""
+    	if val < 0 then sign = 1; val = -val end
+    	local mantissa, exponent = math.frexp(val)
+    	if val == 0 then mantissa = 0; exponent = 0 else
+        	mantissa = (mantissa * 2 - 1) * math.ldexp(0.5, 24)
+        	exponent = exponent + 126
+    	end
+    	val, byte = ShortToBytes(mantissa); v = v..byte
+    	val, byte = ShortToBytes(val); v = v..byte
+    	val, byte = ShortToBytes(exponent * 128 + val); v = v..byte
+    	val, byte = ShortToBytes(sign * 128 + val); v = v..byte
 	return string.char(math.floor(can_id / 256), math.floor(can_id) % 256, node_id, TYPE_FLOAT, service_code, 
 	genMessageCode(can_id), string.byte(v, 4), string.byte(v, 3), string.byte(v, 2), string.byte(v, 1))  									
 
