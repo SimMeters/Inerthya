@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------------------------------------------
--- Copyright (c) 2015, SimMeters
+-- Copyright (c) 2015, SimMeters.com
 -- All rights reserved. Released under the BSD license.
 -- KT1B_ASI.jal 1.0 01/01/2014 (KT1B Airspeed Indicator)
 
@@ -30,10 +30,10 @@ include sgcdisplay      -- 4DSystems Display Library
 -- Variables Declaration
 ------------------------------------------------------------------------------------------------------------------------
 var can_frame cf
-var float asi = 0.0
-var float cas = 0.0
-var dword macv = 0
-var dword macl = 0
+var float asi 	= 0.0
+var float cas 	= 0.0
+var dword macv 	= 0
+var dword macl 	= 0
 
 ------------------------------------------------------------------------------------------------------------------------
 -- Initialization
@@ -66,7 +66,6 @@ dsta = 0
 
 setup_can_init()
 add_can_rxfilter(id_request_bootloader)
-add_can_rxfilter(id_lamps_0_31)
 add_can_rxfilter(id_mach_number)
 add_can_rxfilter(id_indicated_airspeed)
 add_can_rxfilter(id_calibrated_airspeed)
@@ -122,62 +121,56 @@ end procedure
 ------------------------------------------------------------------------------------------------------------------------
 forever loop 
     
-    opaque_text(true)
-    request_bootloader("KT1B_ASI")
+	opaque_text(true)
+	request_bootloader("KT1B_ASI")
 
-    cf = get_can_frame(id_lamps_0_31)
-    if(cf.dlc > 0) then
+	cf = get_can_frame(id_mach_number)
+	if(cf.dlc > 0) then
     
-        led_l = ((get_can_uint32(cf) & mask_lamp_00) != 0)
-        led_r = ((get_can_uint32(cf) & mask_lamp_00) != 0)
-    
-    end if
+		macv = dword(get_can_float(cf) * float(100))
+		if(macv != macl) then
 
-    cf = get_can_frame(id_mach_number)
-    if(cf.dlc > 0) then
-    
-        macv = dword(get_can_float(cf) * float(100))
-        if(macv != macl) then
+			macl = macv
+			print_mach(0x02, 0x06, 0x01, 0xFF, 0xFF, macv)
 
-            macl = macv
-            print_mach(0x02, 0x06, 0x01, 0xFF, 0xFF, macv)
+        	end if
 
-        end if
+    	end if
 
-    end if
-
-    cf = get_can_frame(id_indicated_airspeed)
-    if(cf.dlc > 0) then
+    	cf = get_can_frame(id_indicated_airspeed)
+    	if(cf.dlc > 0) then
 		
-        asi = get_can_float(cf) * float(1.9438)
+        	led_l 	= cf.data2
+		led_r 	= led_l
+        	asi = get_can_float(cf) * float(1.9438)
 
-        if (asi <= float(0)) then
-            dsta = 0
-        elsif (asi > float(0) & asi <= float(60)) then
-            dsta = dword(asi * float(8))
-        elsif (asi > float(60) & asi <= float(180)) then
-            dsta = dword(480 + ((asi - 60) * float(27.2)))
-        elsif (asi > float(180) & asi <= float(400)) then
-            dsta = dword(3744 + ((asi - 180) * float(16.8)))
-        elsif (asi > float(400)) then
-            dsta = 7440
-        end if
+        	if (asi <= float(0)) then
+            		dsta = 0
+        	elsif (asi > float(0) & asi <= float(60)) then
+            		dsta = dword(asi * float(8))
+        	elsif (asi > float(60) & asi <= float(180)) then
+            		dsta = dword(480 + ((asi - 60) * float(27.2)))
+        	elsif (asi > float(180) & asi <= float(400)) then
+            		dsta = dword(3744 + ((asi - 180) * float(16.8)))
+        	elsif (asi > float(400)) then
+            		dsta = 7440
+        	end if
 
-        set_vid2905()
+        	set_vid2905()
 
-    end if
+    	end if
 
-    cf = get_can_frame(id_calibrated_airspeed)
-    if(cf.dlc > 0) then
+    	cf = get_can_frame(id_calibrated_airspeed)
+    	if(cf.dlc > 0) then
 
-        cas = get_can_float(cf) * float(1.9438)
+        	cas = get_can_float(cf) * float(1.9438)
 
-        if(asi > cas) then
-            prints(0x02, 0x04, 0x01, 0xFF, 0xFF, "OVSP")
-        else
-            print_asi(0x02, 0x04, 0x01, 0xFF, 0xFF, dword(cas))
-        end if
+        	if(asi > cas) then
+            		prints(0x02, 0x04, 0x01, 0xFF, 0xFF, "OVSP")
+        	else
+            		print_asi(0x02, 0x04, 0x01, 0xFF, 0xFF, dword(cas))
+        	end if
 
-    end if
+    	end if
 
 end loop
