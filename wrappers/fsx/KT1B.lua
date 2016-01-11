@@ -54,17 +54,17 @@ socket.try(con:setpeername("192.168.1.100", 6060))
 canOpsTable 	= {}
 uhf_frequency 	= 320.00
 uhf_channel 	= 1
-uhf_mode 		= 0
+uhf_mode 	= 0
 
 ------------------------------------------------------------------------------------------------------------------------
 -- Input Commands
 ------------------------------------------------------------------------------------------------------------------------
-canOpsTable[0x220A0801] = function() ipc.writeUW(0x0330, ipc.readUW(0x0330) - 1) end 					-- DECREASE QHN
-canOpsTable[0x220A0802] = function() ipc.writeUW(0x0330, ipc.readUW(0x0330) + 1) end 					-- INCREASE QNH
-canOpsTable[0x160A3001] = function() ipc.writeSD(0x02C4, ipc.readSD(0x02C4) - 50) end 					-- DECREASE IDX SPEED
-canOpsTable[0x160A3002] = function() ipc.writeSD(0x02C4, ipc.readSD(0x02C4) + 50) end 					-- INCREASE IDX SPEED
-canOpsTable[0x160A4001] = function() ipc.writeDBL(0x3428, ipc.readDBL(0x3428) - 1) end 					-- DECREASE DH
-canOpsTable[0x160A4002] = function() ipc.writeDBL(0x3428, ipc.readDBL(0x3428) + 1) end 					-- INCREASE DH
+canOpsTable[0x220A0801] = function() ipc.writeUW(0x0330, ipc.readUW(0x0330) - 1) end 	-- DECREASE QHN
+canOpsTable[0x220A0802] = function() ipc.writeUW(0x0330, ipc.readUW(0x0330) + 1) end 	-- INCREASE QNH
+canOpsTable[0x160A3001] = function() ipc.writeSD(0x02C4, ipc.readSD(0x02C4) - 50) end 	-- DECREASE IDX SPEED
+canOpsTable[0x160A3002] = function() ipc.writeSD(0x02C4, ipc.readSD(0x02C4) + 50) end 	-- INCREASE IDX SPEED
+canOpsTable[0x160A4001] = function() ipc.writeDBL(0x3428, ipc.readDBL(0x3428) - 1) end 	-- DECREASE DH
+canOpsTable[0x160A4002] = function() ipc.writeDBL(0x3428, ipc.readDBL(0x3428) + 1) end 	-- INCREASE DH
 canOpsTable[0x2C1E1902] = function() uhf_frequency = uhf_frequency + 0.25 end 							-- UHF_KHZ_FREQUENCY_INC
 canOpsTable[0x2C1E1901] = function() uhf_frequency = uhf_frequency - 0.25 end 							-- UHF_KHZ_FREQUENCY_DEC
 canOpsTable[0x2C1E1A02] = function() uhf_frequency = uhf_frequency + 1.0 end 							-- UHF_MHZ_FREQUENCY_INC
@@ -187,16 +187,16 @@ while true do
 	local data = con:receive()
 	if data then
 
-		CAN_IDH 		= string.byte(data,  1) 	-- CAN_IDH
-		CAN_IDL 		= string.byte(data,  2) 	-- CAN_IDL
-		NODE_ID 		= string.byte(data,  3) 	-- NODE ID RESERVED ALWAYS 0
-		DATA_TYPE 		= string.byte(data,  4) 	-- DATA TYPE ALWAYS BCHAR
-		SERVICE_CODE 	= string.byte(data,  5) 	-- SERVICE CODE DEVICE TYPE 0 UNKNOWN, 1 SWITCH, 2 ENCODER, 3 ANALOG
-		MESSAGE_CODE 	= string.byte(data,  6) 	-- MESSAGE CODE COUNTER 0 - 255
-		DATA3 			= string.byte(data,  7) 	-- ATA CHAPTER
-		DATA2 			= string.byte(data,  8) 	-- ATA SUBCHAPTER
-		DATA1 			= string.byte(data,  9) 	-- DEVICE NUMBER BUTTON0, BUTTON1, ENCODER2, ANALOG HSB
-		DATA0 			= string.byte(data, 10) 	-- DEVICE VALUE ON/OFF, ENC LEFT/RIGHT , ANALOG LSB
+		CAN_IDH 	= string.byte(data,  1) -- CAN_IDH
+		CAN_IDL 	= string.byte(data,  2) -- CAN_IDL
+		NODE_ID 	= string.byte(data,  3) -- NODE ID RESERVED ALWAYS 0
+		DATA_TYPE 	= string.byte(data,  4) -- DATA TYPE ALWAYS BCHAR
+		SERVICE_CODE 	= string.byte(data,  5) -- SERVICE CODE DEVICE TYPE 0 UNKNOWN, 1 SWITCH, 2 ENCODER, 3 ANALOG
+		MESSAGE_CODE 	= string.byte(data,  6) -- MESSAGE CODE COUNTER 0 - 255
+		DATA3 		= string.byte(data,  7) -- ATA CHAPTER
+		DATA2 		= string.byte(data,  8) -- ATA SUBCHAPTER
+		DATA1 		= string.byte(data,  9) -- DEVICE NUMBER BUTTON0, BUTTON1, ENCODER2, ANALOG HSB
+		DATA0 		= string.byte(data, 10) -- DEVICE VALUE ON/OFF, ENC LEFT/RIGHT , ANALOG LSB
 
 		if SERVICE_CODE == SC1 or SERVICE_CODE == SC2 then 	-- SWITCH/ENCODER DEVICE
 			canOpsTable[((DATA3 * (16^6)) + (DATA2 * (16^4)) + (DATA1 * (16^2)) + DATA0)]()
