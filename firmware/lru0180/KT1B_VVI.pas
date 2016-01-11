@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------------------------------------------
--- Copyright (c) 2015, SimMeters
+-- Copyright (c) 2015, SimMeters.com
 -- All rights reserved. Released under the BSD license.
 -- KT1B_VVI.jal 1.0 01/01/2014 (KT1B Vertical Speed Indicator 6,000 FPM AZ)
 
@@ -20,7 +20,6 @@
 -- WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
 -- USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ------------------------------------------------------------------------------------------------------------------------
-include atachapters     -- Library constants ATA Chapters
 include canaerospace    -- Constants for CANAerospace
 include lru0180         -- Include For LRU Gauge Device Type
 include canbus          -- CanBus Library
@@ -50,7 +49,6 @@ dsta = 0
 
 setup_can_init()
 add_can_rxfilter(id_request_bootloader)
-add_can_rxfilter(id_lamps_0_31)
 add_can_rxfilter(id_altitude_rate)
 setup_can_end()
 
@@ -64,16 +62,11 @@ forever loop
     
     request_bootloader("KT1B_VVI")
 
-    cf = get_can_frame(id_lamps_0_31)
-    if(cf.dlc > 0) then
-    
-        led_l = ((get_can_uint32(cf) & mask_lamp_00) != 0)
-        led_r = ((get_can_uint32(cf) & mask_lamp_00) != 0)
-    
-    end if
-    
 	cf = get_can_frame(id_altitude_rate)
-    if(cf.dlc > 0) then
+    	if(cf.dlc > 0) then
+
+		led_l = cf.data2
+		led_r = led_l
 
         vvi = ((get_can_float(cf) * float(196.8503)) + float(6000)) -- Vertical Speed m/s to fpm
 
