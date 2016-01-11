@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------------------------------------------------
--- Copyright(c) 2015, SimMeters, Pt Wahana Kreasi Teknologi
+-- Copyright(c) 2016, SimMeters.com
 -- All rights reserved. Released under the BSD license.
--- KT1B.lua 1.0 01/10/2015 (Import/Export script for Inerthya KT1B FTD)
+-- KT1B.lua 1.0 01/01/2016 (Import/Export script for Inerthya KT1B FTD)
 
 -- Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
 -- following conditions are met:
@@ -52,9 +52,9 @@ socket.try(con:setpeername("192.168.1.100", 6060))
 -- Global Variables
 ------------------------------------------------------------------------------------------------------------------------
 canOpsTable 	= {}
-uhf_frequency 	= 320.00
-uhf_channel 	= 1
-uhf_mode 	= 0
+uhf_frq		= 320.00
+uhf_chn 	= 1
+uhf_mod 	= 0
 
 ------------------------------------------------------------------------------------------------------------------------
 -- Input Commands
@@ -65,22 +65,22 @@ canOpsTable[0x160A3001] = function() ipc.writeSD(0x02C4, ipc.readSD(0x02C4) - 50
 canOpsTable[0x160A3002] = function() ipc.writeSD(0x02C4, ipc.readSD(0x02C4) + 50) end 	-- INCREASE IDX SPEED
 canOpsTable[0x160A4001] = function() ipc.writeDBL(0x3428, ipc.readDBL(0x3428) - 1) end 	-- DECREASE DH
 canOpsTable[0x160A4002] = function() ipc.writeDBL(0x3428, ipc.readDBL(0x3428) + 1) end 	-- INCREASE DH
-canOpsTable[0x2C1E1902] = function() uhf_frequency = uhf_frequency + 0.25 end 							-- UHF_KHZ_FREQUENCY_INC
-canOpsTable[0x2C1E1901] = function() uhf_frequency = uhf_frequency - 0.25 end 							-- UHF_KHZ_FREQUENCY_DEC
-canOpsTable[0x2C1E1A02] = function() uhf_frequency = uhf_frequency + 1.0 end 							-- UHF_MHZ_FREQUENCY_INC
-canOpsTable[0x2C1E1A01] = function() uhf_frequency = uhf_frequency - 1.0 end 							-- UHF_MHZ_FREQUENCY_DEC
-canOpsTable[0x2C1E1B00] = function() return end 														-- UHF_MODE_OFF
-canOpsTable[0x2C1E1B01] = function() uhf_mode = uhf_mode + 1 if uhf_mode > 9 then uhf_mode = 0 end end 	-- UHF_MODE_ON
-canOpsTable[0x2C1E1C01] = function() return end 														-- UHF_MODE_LSB
-canOpsTable[0x2C1E1C02] = function() return end 														-- UHF_MODE_USB
-canOpsTable[0x2C1E1C03] = function() return end 														-- UHF_MODE_AM
-canOpsTable[0x2C1E1C04] = function() return end 														-- UHF_MODE_TEL
-canOpsTable[0x2C1E1D00] = function() return end 														-- UHF_STD_OFF
-canOpsTable[0x2C1E1D01] = function() return end 														-- UHF_STD_ON
-canOpsTable[0x2C1E1E00] = function() return end 														-- UHF_TONE_OFF
-canOpsTable[0x2C1E1E01] = function() return end 														-- UHF_TONE_ON
-canOpsTable[0x2C1E1F00] = function() return end 														-- UHF_TEST_OFF
-canOpsTable[0x2C1E1F01] = function() sound.play("squelch") end											-- UHF_TEST_ON
+canOpsTable[0x2C1E1902] = function() uhf_frq = uhf_frq + 0.25 end 			-- UHF_KHZ_FREQUENCY_INC
+canOpsTable[0x2C1E1901] = function() uhf_frq = uhf_frq - 0.25 end 			-- UHF_KHZ_FREQUENCY_DEC
+canOpsTable[0x2C1E1A02] = function() uhf_frq = uhf_frq + 1.0 end 			-- UHF_MHZ_FREQUENCY_INC
+canOpsTable[0x2C1E1A01] = function() uhf_frq = uhf_frq - 1.0 end 			-- UHF_MHZ_FREQUENCY_DEC
+canOpsTable[0x2C1E1B00] = function() return end 					-- UHF_MODE_OFF
+canOpsTable[0x2C1E1B01] = function() uhf_mod = uhf_mod + 1 if uhf_mod > 9 then uhf_mod = 0 end end -- UHF_MODE_ON
+canOpsTable[0x2C1E1C01] = function() return end 					-- UHF_MODE_LSB
+canOpsTable[0x2C1E1C02] = function() return end 					-- UHF_MODE_USB
+canOpsTable[0x2C1E1C03] = function() return end 					-- UHF_MODE_AM
+canOpsTable[0x2C1E1C04] = function() return end 					-- UHF_MODE_TEL
+canOpsTable[0x2C1E1D00] = function() return end 					-- UHF_STD_OFF
+canOpsTable[0x2C1E1D01] = function() return end 					-- UHF_STD_ON
+canOpsTable[0x2C1E1E00] = function() return end 					-- UHF_TONE_OFF
+canOpsTable[0x2C1E1E01] = function() return end 					-- UHF_TONE_ON
+canOpsTable[0x2C1E1F00] = function() return end 					-- UHF_TEST_OFF
+canOpsTable[0x2C1E1F01] = function() sound.play("squelch") end				-- UHF_TEST_ON
 
 ------------------------------------------------------------------------------------------------------------------------
 -- Main Loop
@@ -149,7 +149,7 @@ while true do
 	flightData = flightData..packFloat(CA_CABIN_PRESSURE, NODE_AHRS, var_bat, var_oxy)
 	
 	-- Flap Indicator with surface transition and battery status
-	var_flp = ipc.readUW(0x30E0) 															-- FLAP SURFACE POSITION
+	var_flp = ipc.readUW(0x30E0) 									-- FLAP SURFACE POSITION
 	if(var_bat == 1 and var_flp == 0) then
 		flightData = flightData..packFloat(CA_FLAPS_LEVER_POSITION, NODE_AHRS, var_bat, 1.0) 	-- UP MARK
 	elseif (var_bat == 1 and var_flp == 7537) then
@@ -161,19 +161,19 @@ while true do
 	end
 
 	-- Export UHF Test Data Used STD CANAerospace Variables
-	flightData = flightData..packFloat(CA_DME_4_CHANNEL, NODE_AHRS, var_bat, uhf_channel) 		-- UHF_CHANNEL
-	flightData = flightData..packFloat(CA_TRANSPONDER_4_CODE, NODE_AHRS, var_bat, uhf_mode) 	-- UHF_MODE
-	flightData = flightData..packFloat(CA_ADF_4_FREQUENCY, NODE_AHRS, var_bat, uhf_frequency) 	-- UHF_FREQUENCY
+	flightData = flightData..packFloat(CA_DME_4_CHANNEL, NODE_AHRS, var_bat, uhf_channel)		-- UHF_CHANNEL
+	flightData = flightData..packFloat(CA_TRANSPONDER_4_CODE, NODE_AHRS, var_bat, uhf_mode)		-- UHF_MODE
+	flightData = flightData..packFloat(CA_ADF_4_FREQUENCY, NODE_AHRS, var_bat, uhf_frequency)	-- UHF_FREQUENCY
 	
-	-- Export User Defined Flags UD_FLAGS_0_31													-- USE SERVICE CODE INSTEAD
-	-- var_fl1 = 0																				-- DEFAULT ALL FLAGS TO 0
+	-- Export User Defined Flags UD_FLAGS_0_31							-- USE SERVICE CODE INSTEAD
+	-- var_fl1 = 0											-- DEFAULT ALL FLAGS TO 0
 	-- if(var_bat == 1) then 
-	--	var_fl1 = sbit(var_fl1,  0)															-- SET FLAG GAUGES LIGHTS
-	--	var_fl1 = sbit(var_fl1,  1)															-- SET FLAG MASTER BATTERY
-	--	var_fl1 = sbit(var_fl1, 15)															-- SET FLAG UHF TEST LAMP
+	--	var_fl1 = sbit(var_fl1,  0)								-- SET FLAG GAUGES LIGHTS
+	--	var_fl1 = sbit(var_fl1,  1)								-- SET FLAG MASTER BATTERY
+	--	var_fl1 = sbit(var_fl1, 15)								-- SET FLAG UHF TEST LAMP
 	-- end
-	-- var_avc = ipc.readUD(0x2E80) 															-- MASTER AVIONICS
-	-- if(var_avc ~=nil and var_avc == 1) then var_fl1 = sbit(var_fl1, 2) end					-- SET FLAG MASTER AVIONICS
+	-- var_avc = ipc.readUD(0x2E80) 								-- MASTER AVIONICS
+	-- if(var_avc ~=nil and var_avc == 1) then var_fl1 = sbit(var_fl1, 2) end			-- SET FLAG MASTER AVIONICS
 	-- flightData = flightData..packUint32(UD_FLAGS_0_31, NODE_AHRS, var_bat, var_fl1)
 
 ------------------------------------------------------------------------------------------------------------------------
