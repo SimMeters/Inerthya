@@ -161,9 +161,9 @@ while true do
 	end
 
 	-- Export UHF Test Data Used STD CANAerospace Variables
-	flightData = flightData..packFloat(CA_DME_4_CHANNEL, NODE_AHRS, var_bat, uhf_channel)		-- UHF_CHANNEL
-	flightData = flightData..packFloat(CA_TRANSPONDER_4_CODE, NODE_AHRS, var_bat, uhf_mode)		-- UHF_MODE
-	flightData = flightData..packFloat(CA_ADF_4_FREQUENCY, NODE_AHRS, var_bat, uhf_frequency)	-- UHF_FREQUENCY
+	flightData = flightData..packFloat(CA_DME_4_CHANNEL, NODE_AHRS, var_bat, uhf_chn)		-- UHF_CHANNEL
+	flightData = flightData..packFloat(CA_TRANSPONDER_4_CODE, NODE_AHRS, var_bat, uhf_mod)		-- UHF_MODE
+	flightData = flightData..packFloat(CA_ADF_4_FREQUENCY, NODE_AHRS, var_bat, uhf_frq)		-- UHF_FREQUENCY
 	
 	-- Export User Defined Flags UD_FLAGS_0_31							-- USE SERVICE CODE INSTEAD
 	-- var_fl1 = 0											-- DEFAULT ALL FLAGS TO 0
