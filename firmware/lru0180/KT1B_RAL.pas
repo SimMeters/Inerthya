@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------------------------------------------
--- Copyright (c) 2015, SimMeters
+-- Copyright (c) 2015, SimMeters.com
 -- All rights reserved. Released under the BSD license.
 -- KT1B_RAL.jal 1.0 01/01/2014 (KT1B Radar Altimeter)
 
@@ -59,7 +59,6 @@ dstb = 0
 
 setup_can_init()
 add_can_rxfilter(id_request_bootloader)
-add_can_rxfilter(id_lamps_0_31)
 add_can_rxfilter(id_radio_height)
 add_can_rxfilter(id_decision_height)
 setup_can_end()
@@ -117,17 +116,11 @@ forever loop
     adjust_vid2805()
     request_bootloader("KT1B_RAL")
 
-    cf = get_can_frame(id_lamps_0_31)
-    if(cf.dlc > 0) then
-
-        led_r = ((get_can_uint32(cf) & mask_lamp_00) != 0)
-
-    end if
-
     cf = get_can_frame(id_radio_height)
     if(cf.dlc > 0) then
 		
-        ral = get_can_float(cf) * float(3.2808)
+	led_r 	= cf.data2	
+        ral 	= get_can_float(cf) * float(3.2808)
 
         if (ral <= float(0)) then
             dsta = 0
