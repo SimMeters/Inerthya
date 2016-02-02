@@ -1,0 +1,119 @@
+------------------------------------------------------------------------------------------------------------------------
+-- Copyright (c) 2016, SimMeters.com
+-- All rights reserved. Released under the BSD license.
+-- EC120RPM.jal 1.0 02/01/2016 (EC120B RPM N2 + ROTOR %RPM 60MM AZ)
+
+-- Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
+-- following conditions are met:
+
+-- 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the
+-- following disclaimer.
+
+-- 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+-- following disclaimer in the documentation and/or other materials provided with the distribution.
+
+-- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+-- INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+-- DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+-- SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+-- SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+-- WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+-- USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+------------------------------------------------------------------------------------------------------------------------
+include canaerospace    -- Library for CAN Aerospace constants
+include lru0160         -- Library for LRU-0160 60MM gauge
+include canbus          -- Library for CANBus
+
+------------------------------------------------------------------------------------------------------------------------
+-- Variables Declaration
+------------------------------------------------------------------------------------------------------------------------
+var can_frame cf
+var float rro = 0.0
+var float rn2 = 0.0
+
+------------------------------------------------------------------------------------------------------------------------
+-- Initialization
+------------------------------------------------------------------------------------------------------------------------
+_usec_delay(1000000)
+
+led_l = on
+led_r = on
+
+srca = 0
+dsta = 7560
+set_jukenX40()
+srca = 7560
+dsta = 0
+set_jukenX40()
+
+srcb = 0
+dstb = 7560
+set_jukenX40()
+srcb = 7560
+dstb = 0
+set_jukenX40()
+
+srca = 0
+dsta = 0
+srcb = 0
+dstb = 0
+
+setup_can_init()
+add_can_rxfilter(id_request_bootloader)
+add_can_rxfilter(id_engine_1_n2_ecs_channel_a)
+add_can_rxfilter(id_rotor_1_rpm)
+setup_can_end()
+
+led_l = off
+led_r = off
+
+------------------------------------------------------------------------------------------------------------------------
+-- Main Loop
+------------------------------------------------------------------------------------------------------------------------
+forever loop
+
+    request_bootloader("EC120RPM")
+
+    cf = get_can_frame(id_engine_1_n2_ecs_channel_a)
+    if(cf.dlc > 0) then
+
+		led_l   = cf.data2
+		led_r   = cf.data2
+		rn2     = get_can_float(cf)
+
+		if (rn2 <= float(0)) then
+            dsta = 0
+        elsif (rn2 > float(0) & rn2 <= float(50)) then
+            dsta = dword(rn2 * float(21.6))
+        elsif (rn2 > float(50) & rn2 <= float(80)) then
+            dsta = dword(1080 + ((rn2 - 50) * float(72)))
+        elsif (rn2 > float(80) & rn2 <= float(120)) then
+            dsta = dword(3240 + ((rn2 - 80) * float(108)))
+        elsif (rn2 > float(120)) then
+            dsta = 7560
+        end if
+	
+    end if
+	
+    cf = get_can_frame(id_rotor_1_rpm)
+    if(cf.dlc > 0) then
+
+		rro = get_can_float(cf)
+	
+		if (rro <= float(0)) then
+            dstb = 0
+        elsif (rro > float(0) & rro <= float(50)) then
+            dstb = dword(rro * float(21.6))
+        elsif (rro > float(50) & rro <= float(80)) then
+            dstb = dword(1080 + ((rro - 50) * float(72)))
+        elsif (rro > float(80) & rro <= float(120)) then
+            dstb = dword(3240 + ((rro - 80) * float(108)))
+        elsif (rro > float(120)) then
+            dstb = 7560
+        end if
+	
+    end if
+
+	set_jukenX40()
+	
+end loop

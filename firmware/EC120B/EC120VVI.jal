@@ -1,0 +1,88 @@
+------------------------------------------------------------------------------------------------------------------------
+-- Copyright (c) 2016, SimMeters.com
+-- All rights reserved. Released under the BSD license.
+-- EC120VVI.jal 1.0 02/01/2016 (EC120B Vertical Speed Indicator 2000FPM 60MM AZ)
+
+-- Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
+-- following conditions are met:
+
+-- 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the
+-- following disclaimer.
+
+-- 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+-- following disclaimer in the documentation and/or other materials provided with the distribution.
+
+-- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+-- INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+-- DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+-- SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+-- SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+-- WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+-- USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+------------------------------------------------------------------------------------------------------------------------
+include canaerospace    -- Library for CAN Aerospace constants
+include lru0160         -- Library for LRU-0160 60MM gauge
+include canbus          -- Library for CANBus
+
+------------------------------------------------------------------------------------------------------------------------
+-- Variables Declaration
+------------------------------------------------------------------------------------------------------------------------
+var can_frame cf
+var float vvi = 0.0
+
+------------------------------------------------------------------------------------------------------------------------
+-- Initialization
+------------------------------------------------------------------------------------------------------------------------
+_usec_delay(1000000)
+
+led_l = on
+led_r = on
+
+srca = 0
+dsta = 7560
+set_vid2905()
+srca = 7560
+dsta = 0
+set_vid2905()
+srca = 0
+dsta = 0
+
+setup_can_init()
+add_can_rxfilter(id_request_bootloader)
+add_can_rxfilter(id_altitude_rate)
+setup_can_end()
+
+led_l = off
+led_r = off
+
+------------------------------------------------------------------------------------------------------------------------
+-- Main Loop
+------------------------------------------------------------------------------------------------------------------------
+forever loop
+
+    request_bootloader("EC120VVI")
+
+    cf = get_can_frame(id_altitude_rate)
+    if(cf.dlc > 0) then
+		
+        led_l = cf.data2
+        led_r = cf.data2
+        vvi = ((get_can_float(cf) * float(196.8503)) + float(2000))
+
+        if (vvi <= float(0)) then
+            dsta = 0
+        elsif ((vvi > float(0)) & (vvi <= float(1000))) then
+            dsta = dword(vvi * float(1.38))
+        elsif ((vvi > float(1000)) & (vvi <= float(3000))) then
+            dsta = dword(1380 + ((vvi - 1000) * float(2.4)))
+        elsif ((vvi > float(3000)) & (vvi <= float(4000))) then
+            dsta = dword(6180 + ((vvi - 3000) * float(1.38)))
+        elsif (vvi > float(4000)) then
+            dsta = 7560
+        end if
+
+        set_vid2905()
+    
+    end if
+
+end loop

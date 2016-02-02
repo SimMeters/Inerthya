@@ -1,0 +1,152 @@
+------------------------------------------------------------------------------------------------------------------------
+-- Copyright (c) 2015, SimMeters.com
+-- All rights reserved. Released under the BSD license.
+-- EC120UHF.jal 1.0 01/01/2015 (EC120 UHF Radio)
+
+-- Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
+-- following conditions are met:
+
+-- 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the
+-- following disclaimer.
+
+-- 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+-- following disclaimer in the documentation and/or other materials provided with the distribution.
+
+-- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+-- INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+-- DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+-- SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+-- SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+-- WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+-- USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+-- NOTES THE POT ARE NOT IMPLEMMENTED
+------------------------------------------------------------------------------------------------------------------------
+include atachapters     -- Constants for ATA Chapters
+include canaerospace    -- Constants for CANAerospace
+include lru0000         -- Include For LRU Device Type
+include canbus          -- CanBus Library
+include objects         -- Objects Library
+include spidisplay      -- Library for Display
+
+------------------------------------------------------------------------------------------------------------------------
+-- Initialization
+------------------------------------------------------------------------------------------------------------------------
+_usec_delay(1000000)
+
+setup_can_init()
+add_can_rxfilter(id_request_bootloader)
+add_can_rxfilter(id_dme_4_channel)          -- used as UHF channel
+add_can_rxfilter(id_transponder_4_code)     -- used as UHF mode
+add_can_rxfilter(id_adf_4_frequency)        -- used as UHF frequency
+setup_can_end()
+
+-- init screen
+spi_enable(3)
+spi_clear_screen(p31)
+spi_set_font(p31, 200)
+spi_print_string(p31, 0, 0, "00")
+spi_print_string(p31, 10, 0, "0")
+spi_print_string(p31, 4, 2, "000.00")
+
+set_pin(P21, high)  -- set green led on
+set_pin(P22, low)   -- set red led off
+
+------------------------------------------------------------------------------------------------------------------------
+-- Objects Definition
+------------------------------------------------------------------------------------------------------------------------
+var can_frame cf
+var dword uhf_channel
+var dword uhf_channel_latch
+var dword uhf_mode
+var dword uhf_mode_latch
+var dword uhf_frequency
+var dword uhf_frequency_latch
+
+var volatile en2p en00 = new_en2p(p05, p06, UHF_FREQUENCY_DEC, UHF_FREQUENCY_INC) -- encoder
+var volatile rs4p rs00 = new_rs4p(p07, p08, p09, p10, p19, UHF_MODE_LSB, UHF_MODE_USB, UHF_MODE_AM, UHF_MODE_TEL) -- selector
+var volatile sw2p sw00 = new_sw2p(p11, P19, UHF_STD_ON, UHF_STD_OFF) -- switch std
+
+------------------------------------------------------------------------------------------------------------------------
+-- Process encoders
+------------------------------------------------------------------------------------------------------------------------
+isr_encoder_enable() -- because we use encoders
+procedure isr_encoder_process() is pragma interrupt
+
+    if (INTCON_TMR0IF) then
+        
+		process_en2p(en00)
+        isr_encoder_reset()
+    
+	end if
+
+end procedure
+
+------------------------------------------------------------------------------------------------------------------------
+-- Main Loop
+------------------------------------------------------------------------------------------------------------------------
+forever loop 
+
+    -- request bootloader for auto update (do not remove)
+    request_bootloader("EC120UHF")
+
+    -- process channel
+    cf = get_can_frame(id_dme_4_channel)
+    if(cf.dlc > 0) then
+        
+        uhf_channel = dword(get_can_float(cf) * float(1))
+        if(uhf_channel != uhf_channel_latch) then
+
+            case uhf_channel of
+                0: spi_print_string(p31, 0, 0, "00")
+                1: spi_print_string(p31, 0, 0, "01")
+                2: spi_print_string(p31, 0, 0, "02")
+                3: spi_print_string(p31, 0, 0, "03")
+                4: spi_print_string(p31, 0, 0, "04")
+                5: spi_print_string(p31, 0, 0, "05")
+                6: spi_print_string(p31, 0, 0, "06")
+                7: spi_print_string(p31, 0, 0, "07")
+                8: spi_print_string(p31, 0, 0, "08")
+                9: spi_print_string(p31, 0, 0, "09")
+                10: spi_print_string(p31, 0, 0, "10")
+                otherwise spi_print_string(p31, 0, 0, "00")
+            end case
+            
+            uhf_channel_latch = uhf_channel
+        
+        end if
+
+    end if
+
+    -- process mode MHZ
+    cf = get_can_frame(id_transponder_4_code)
+    if(cf.dlc > 0) then
+
+        uhf_mode = dword(get_can_float(cf) * float(1))
+        
+        if(uhf_mode != uhf_mode_latch) then
+            spi_print_int(p31, 10, 0, uhf_mode)
+            uhf_mode_latch = uhf_mode
+        end if
+
+    end if
+
+    -- process frequency KHZ
+    cf = get_can_frame(id_adf_4_frequency)
+    if(cf.dlc > 0) then
+        
+        uhf_frequency = dword(get_can_float(cf) * float(1000))
+        
+        if(uhf_frequency != uhf_frequency_latch) then
+            spi_print_mhz(p31, 4, 2, uhf_frequency)
+            uhf_frequency_latch = uhf_frequency
+            
+        end if
+        
+    end if
+
+    -- process devices
+    process_rs4p(rs00)
+    process_sw2p(sw00)
+
+end loop
