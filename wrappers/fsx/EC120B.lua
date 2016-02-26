@@ -35,6 +35,7 @@ socket = require("socket")
 con = socket.try(socket.udp())
 cmd = socket.try(socket.udp())
 socket.try(con:settimeout(.001))
+socket.try(cmd:settimeout(.001))
 socket.try(con:setpeername("169.254.2.33", 6060))
 socket.try(cmd:setpeername("192.168.1.100", 6060)) -- change this ip by the software and port running VEMD software
 
