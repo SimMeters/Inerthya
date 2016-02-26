@@ -33,9 +33,10 @@ uhf_chn = 5
 ------------------------------------------------------------------------------------------------------------------------
 socket = require("socket")
 con = socket.try(socket.udp())
+cmd = socket.try(socket.udp())
 socket.try(con:settimeout(.001))
-socket.try(con:setpeername("192.168.1.100", 6060))
---socket.try(con:setpeername("169.254.2.33", 6060))
+socket.try(con:setpeername("169.254.2.33", 6060))
+socket.try(cmd:setpeername("192.168.1.100", 6060)) -- change this ip by the software and port running VEMD software
 
 ------------------------------------------------------------------------------------------------------------------------
 -- Input Commands
@@ -47,26 +48,26 @@ canOpsTable[0x220A0801] = function() ipc.writeUW(0x0330, ipc.readUW(0x0330) - 1)
 canOpsTable[0x220A0802] = function() ipc.writeUW(0x0330, ipc.readUW(0x0330) + 1) end
 
 -- VEMD Keys
-canOpsTable[0x1F0A0A00] = function() ipc.display("VEMD_1_OFF") 			end -- VEMD_1_OFF
-canOpsTable[0x1F0A0A01] = function() ipc.display("VEMD_1_ON") 			end -- VEMD_1_ON
-canOpsTable[0x1F0A0B00] = function() ipc.display("VEMD_2_OFF") 			end -- VEMD_2_OFF
-canOpsTable[0x1F0A0B01] = function() ipc.display("VEMD_2_ON") 			end -- VEMD_2_ON
-canOpsTable[0x1F0A0C00] = function() ipc.display("VEMD_SCROLL_OFF") 	end -- VEMD_SCROLL_OFF
-canOpsTable[0x1F0A0C01] = function() ipc.display("VEMD_SCROLL_ON") 		end -- VEMD_SCROLL_ON
-canOpsTable[0x1F0A0D00] = function() ipc.display("VEMD_RESET_OFF") 		end -- VEMD_RESET_OFF
-canOpsTable[0x1F0A0D01] = function() ipc.display("VEMD_RESET_ON") 		end -- VEMD_RESET_ON
-canOpsTable[0x1F0A0E00] = function() ipc.display("VEMD_SELECT_OFF") 	end -- VEMD_SELECT_OFF
-canOpsTable[0x1F0A0E01] = function() ipc.display("VEMD_SELECT_ON") 		end -- VEMD_SELECT_ON
-canOpsTable[0x1F0A0F00] = function() ipc.display("VEMD_INC_OFF") 		end -- VEMD_INC_OFF
-canOpsTable[0x1F0A0F01] = function() ipc.display("VEMD_INC_ON") 		end -- VEMD_INC_ON
-canOpsTable[0x1F0A1000] = function() ipc.display("VEMD_DEC_OFF") 		end -- VEMD_DEC_OFF
-canOpsTable[0x1F0A1001] = function() ipc.display("VEMD_DEC_ON") 		end -- VEMD_DEC_ON
-canOpsTable[0x1F0A1100] = function() ipc.display("VEMD_ENTER_OFF") 		end -- VEMD_ENTER_OFF
-canOpsTable[0x1F0A1101] = function() ipc.display("VEMD_ENTER_ON") 		end -- VEMD_ENTER_ON
-canOpsTable[0x1F0A1200] = function() ipc.display("VEMD_BRT_INC_OFF") 	end -- VEMD_BRT_INC_OFF
-canOpsTable[0x1F0A1201] = function() ipc.display("VEMD_BRT_INC_ON") 	end -- VEMD_BRT_INC_ON
-canOpsTable[0x1F0A1300] = function() ipc.display("VEMD_BRT_DEC_OFF") 	end -- VEMD_BRT_DEC_OFF
-canOpsTable[0x1F0A1301] = function() ipc.display("VEMD_BRT_DEC_ON") 	end -- VEMD_BRT_DEC_ON
+canOpsTable[0x1F0A0A00] = function() socket.try(cmd:send("VEMD_1_OFF\n"))		end -- VEMD_1_OFF
+canOpsTable[0x1F0A0A01] = function() socket.try(cmd:send("VEMD_1_ON\n")) 		end -- VEMD_1_ON
+canOpsTable[0x1F0A0B00] = function() socket.try(cmd:send("VEMD_2_OFF\n")) 		end -- VEMD_2_OFF
+canOpsTable[0x1F0A0B01] = function() socket.try(cmd:send("VEMD_2_ON\n")) 		end -- VEMD_2_ON
+canOpsTable[0x1F0A0C00] = function() socket.try(cmd:send("VEMD_SCROLL_OFF\n")) 	end -- VEMD_SCROLL_OFF
+canOpsTable[0x1F0A0C01] = function() socket.try(cmd:send("VEMD_SCROLL_ON\n")) 	end -- VEMD_SCROLL_ON
+canOpsTable[0x1F0A0D00] = function() socket.try(cmd:send("VEMD_RESET_OFF\n")) 	end -- VEMD_RESET_OFF
+canOpsTable[0x1F0A0D01] = function() socket.try(cmd:send("VEMD_RESET_ON\n")) 	end -- VEMD_RESET_ON
+canOpsTable[0x1F0A0E00] = function() socket.try(cmd:send("VEMD_SELECT_OFF\n")) 	end -- VEMD_SELECT_OFF
+canOpsTable[0x1F0A0E01] = function() socket.try(cmd:send("VEMD_SELECT_ON\n")) 	end -- VEMD_SELECT_ON
+canOpsTable[0x1F0A0F00] = function() socket.try(cmd:send("VEMD_INC_OFF\n")) 	end -- VEMD_INC_OFF
+canOpsTable[0x1F0A0F01] = function() socket.try(cmd:send("VEMD_INC_ON\n")) 		end -- VEMD_INC_ON
+canOpsTable[0x1F0A1000] = function() socket.try(cmd:send("VEMD_DEC_OFF\n")) 	end -- VEMD_DEC_OFF
+canOpsTable[0x1F0A1001] = function() socket.try(cmd:send("VEMD_DEC_ON\n")) 		end -- VEMD_DEC_ON
+canOpsTable[0x1F0A1100] = function() socket.try(cmd:send("VEMD_ENTER_OFF\n")) 	end -- VEMD_ENTER_OFF
+canOpsTable[0x1F0A1101] = function() socket.try(cmd:send("VEMD_ENTER_ON\n")) 	end -- VEMD_ENTER_ON
+canOpsTable[0x1F0A1200] = function() socket.try(cmd:send("VEMD_BRT_INC_OFF\n")) end -- VEMD_BRT_INC_OFF
+canOpsTable[0x1F0A1201] = function() socket.try(cmd:send("VEMD_BRT_INC_ON\n")) 	end -- VEMD_BRT_INC_ON
+canOpsTable[0x1F0A1300] = function() socket.try(cmd:send("VEMD_BRT_DEC_OFF\n")) end -- VEMD_BRT_DEC_OFF
+canOpsTable[0x1F0A1301] = function() socket.try(cmd:send("VEMD_BRT_DEC_ON\n")) 	end -- VEMD_BRT_DEC_ON
 
 -- UHF Module Input Events
 canOpsTable[0x2C1E1902] = function() uhf_frq = uhf_frq + 0.25 end 	-- UHF_FREQUENCY_INC
