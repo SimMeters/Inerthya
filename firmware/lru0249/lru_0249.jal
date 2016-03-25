@@ -41,20 +41,14 @@ led_r = on
 
 srca = 0
 dsta = 7560
-srcb = 0
-dstb = 7560
-set_jukenX40() -- set_vid2905P()
+set_vid2905()
 
 srca = 7560
 dsta = 0
-srcb = 7560
-dstb = 0
-set_jukenX40() -- set_vid2905P()
+set_vid2905()
 
 srca = 0
 dsta = 0
-srcb = 0
-dstb = 0
 
 setup_can_init()
 add_can_rxfilter(id_request_bootloader)
