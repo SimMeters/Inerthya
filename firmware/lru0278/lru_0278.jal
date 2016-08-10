@@ -38,16 +38,45 @@ _usec_delay(1000000)
 led_l = on
 led_r = on
 
-srca = 0
-dsta = 7560
-set_MOTD()
+-- uncomment below lines as required in order to check motor positions
 
-srca = 7560
-dsta = 0
-set_MOTD()
+--srca = 0
+--dsta = 7560
+--srcb = 0
+--dstb = 7560
 
-srca = 0
-dsta = 0
+-- set_MOTA() --OK
+-- set_MOTAR() --OK
+
+-- set_MOTB() --OK
+-- set_MOTBR() --OK
+
+-- set_MOTC() --OK
+-- set_MOTCR() --OK
+
+-- set_MOTD() --OK
+-- set_MOTDR() --OK
+
+--set_jukenX40() --OK
+
+--srca = 7560
+--dsta = 0
+--srcb = 7560
+--dstb = 0
+
+-- set_MOTA() --OK
+-- set_MOTAR() --OK
+
+-- set_MOTB() --OK
+-- set_MOTBR() --OK
+
+-- set_MOTC() --OK
+-- set_MOTCR() --OK
+
+-- set_MOTD() --OK
+-- set_MOTDR() --OK
+
+--set_jukenX40() --OK
 
 setup_can_init()
 add_can_rxfilter(id_request_bootloader)
