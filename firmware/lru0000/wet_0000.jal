@@ -1,0 +1,115 @@
+------------------------------------------------------------------------------------------------------------------------
+-- Copyright (c) 2016, SimMeters.
+-- All rights reserved. Released under the BSD license.
+-- wet_0000.jal 1.0 01/11/2016 (Wet Compass Indicator 60MM Airpath C2300)
+
+-- Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
+-- following conditions are met:
+
+-- 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the
+-- following disclaimer.
+
+-- 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+-- following disclaimer in the documentation and/or other materials provided with the distribution.
+
+-- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+-- INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+-- DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+-- SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+-- SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+-- WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+-- USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+------------------------------------------------------------------------------------------------------------------------
+include atachapters  -- Include for the atachapters
+include canaerospace -- Include library for CANAerospace ID's
+include lru0000      -- Include library for LRU Type
+include canbus       -- Include library for CANBus
+
+------------------------------------------------------------------------------------------------------------------------
+-- Variables Declaration
+------------------------------------------------------------------------------------------------------------------------
+var can_frame cf
+var dword src = 0
+var dword dst = 0
+var float hdg = 0.0
+
+------------------------------------------------------------------------------------------------------------------------
+-- drv8825 Full Step M0/0 M1/0 M2/0
+------------------------------------------------------------------------------------------------------------------------
+procedure drv8825() is
+
+    while (src != dst) loop
+
+        if (src < dst) then
+            LATA_LATA0 = high
+        elsif (src > dst) then
+            LATA_LATA0 = low
+        end if
+
+        LATA_LATA1 = low
+        _usec_delay(100)
+        LATA_LATA1 = high
+        _usec_delay(100)
+
+        if (src < dst) then
+            src = src + 1
+        elsif (src > dst) then
+            src = src - 1
+        end if
+
+    end loop
+
+end procedure
+
+------------------------------------------------------------------------------------------------------------------------
+-- Initialization
+------------------------------------------------------------------------------------------------------------------------
+led_g = low  -- set green led off
+led_r = high -- set red led on
+
+_usec_delay(1000000) -- 1sec delay on start
+
+setup_can_init()
+add_can_rxfilter(id_request_bootloader)
+--add_can_rxfilter(id_magnetic_heading)
+add_can_rxfilter(id_heading_angle)
+setup_can_end()
+
+src = 0
+dst = 6400
+drv8825()
+src = 0
+dst = 0
+
+led_g = high  -- set green led off
+led_r = low   -- set red led on
+
+------------------------------------------------------------------------------------------------------------------------
+-- Main Loop
+------------------------------------------------------------------------------------------------------------------------
+forever loop
+
+    request_bootloader("wet_0000") -- add support for CANBus firmware upgrade by name
+
+--    cf = get_can_frame(id_magnetic_heading)
+    cf = get_can_frame(id_heading_angle)
+    if(cf.dlc > 0) then
+
+        led_g = (cf.data2 & 0b00000001) -- use bit 0 of service code for lighting gauges
+        led_r = (cf.data2 & 0b00000001) -- use bit 0 of service code for lighting gauges
+
+        hdg = float(360) - get_can_float(cf)
+        dst = dword(hdg * float(17.7)) % 6400
+
+        if ((src > dst) & ((src - dst) > 3200)) then
+            dst = dst + 6400
+        elsif ((src < dst) & ((dst - src) > 3200)) then
+            src = src + 6400
+        end if                    
+        
+        drv8825()
+        src = src % 6400
+
+    end if
+
+end loop
