@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------------------------------------------------
--- Copyright (c) 2015, SimMeters.
+-- Copyright (c) 2017, SimMeters.
 -- All rights reserved. Released under the BSD license.
--- pwm_0000.jal 1.0 01/01/2015 (test firmware for lib tlc59711)
+-- pwm_0000.jal 1.0 01/05/2017 (test firmware for lib tlc59711)
 
 -- Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
 -- following conditions are met:
