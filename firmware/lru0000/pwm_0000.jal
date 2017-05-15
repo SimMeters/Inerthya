@@ -25,6 +25,10 @@
 -- VSS - GND
 -- P32 - CI
 -- P34 - DI
+--
+-- on array from 00 to 0B and value from 0x0000 to 0xFFFF
+-- cansend can0 064#00.00.00.00.00.0B.FF.FF
+--
 ------------------------------------------------------------------------------------------------------------------------
 include canaerospace -- Include library for CANAerospace ID's
 include lru0000      -- Include library for LRU Type
@@ -32,11 +36,17 @@ include tlc59711     -- Include library for PWM driver
 include canbus       -- Include library for CANBus
 
 ------------------------------------------------------------------------------------------------------------------------
+-- Variables Declaration
+------------------------------------------------------------------------------------------------------------------------
+var can_frame cf
+
+------------------------------------------------------------------------------------------------------------------------
 -- Initialization
 ------------------------------------------------------------------------------------------------------------------------
 _usec_delay(1000000) -- 1sec delay on start
 
 setup_can_init()
+add_can_rxfilter(100)                   -- CANBus id for test leds
 add_can_rxfilter(id_request_bootloader) -- add support for CANBus firmware upgrade
 setup_can_end()
 
@@ -50,19 +60,17 @@ forever loop
 
     request_bootloader("pwm_0000") -- add support for CANBus firmware upgrade by name
     
-    -- some random example values for pwm from 0 to 65535 12 channels
-    tlc59711[0] = 65535
-    tlc59711[1] = 4096
-    tlc59711[2] = 0
-    tlc59711[3] = 0
-    tlc59711[4] = 0
-    tlc59711[5] = 0
-    tlc59711[6] = 32000
-    tlc59711[7] = 0
-    tlc59711[8] = 4096
-    tlc59711[9] = 0
-    tlc59711[10] = 0
-    tlc59711[11] = 32000
-    set_tlc59711()
+    cf = get_can_frame(100)
+    if(cf.dlc > 0) then
+
+        var word pwmvalue
+        var byte cdata[2] at pwmvalue
+        cdata[1] = cf.data6
+        cdata[0] = cf.data7
+
+        tlc59711[cf.data5] = pwmvalue
+        set_tlc59711()
+
+    end if
 
 end loop
