@@ -42,7 +42,7 @@ set_pin(P22, low) -- set red led off
 ------------------------------------------------------------------------------------------------------------------------
 forever loop
 
-    request_bootloader("lru_0000") -- add support for CANBus firmware upgrade by name
+    request_bootloader("pwm_0000") -- add support for CANBus firmware upgrade by name
     
     -- some random example values for pwm from 0 to 65535 12 channels
     tlc59711[0] = 65535
