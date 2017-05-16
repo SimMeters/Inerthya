@@ -47,7 +47,7 @@ set_pin(P22, low) -- set red led off
 ------------------------------------------------------------------------------------------------------------------------
 forever loop
 
-    request_bootloader("pwm_0000") -- add support for CANBus firmware upgrade by name
+    request_bootloader("req_0000") -- add support for CANBus firmware upgrade by name
     
     cf = get_can_frame(100)
     if(cf.dlc > 0) then
