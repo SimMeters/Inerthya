@@ -54,11 +54,19 @@ forever loop
 
       -- check status of one pin
       var bit valP12 = get_pin(P12)
-      -- codify values as needed
+      LATE_LATE0 = valP12 
       
-      -- send canbus frame with valP12 bit status, to ID 200 generic receiver id for Inerthya, etc.. 
-      send_can_frame(new_can_frame(101, 8, 0, 0, 0, 0, 0, 0, 0, valP12))
+      -- codify values as needed
+      if valP12 then
+        -- send canbus frame with valP12 bit status, to ID 200 generic receiver id for Inerthya, etc.. 
+        send_can_frame(new_can_frame(101, 8, 0, 0, 0, 0, 0, 0, 0, 0xFF))
+    
+    else
 
+        send_can_frame(new_can_frame(101, 8, 0, 0, 0, 0, 0, 0, 0, 0x00))
+        
+    end if
+    
     end if
 
 end loop
