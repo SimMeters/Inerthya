@@ -55,7 +55,7 @@ int main(int argc, char **argv) {
 	/* display information */
 	printf("\n");
 	printf("SimMeters.com Update Firmware Command Line Tool (Version 1.0 ARM)\n");
-	printf("For any question or support please mail to: support@simmeters.com\n");
+	printf("For any question or support please mail to: sales@simmeters.com\n");
 
 	/* command line arguments */
 	if (argc != 3) {
