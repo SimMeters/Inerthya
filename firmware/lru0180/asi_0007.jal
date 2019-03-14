@@ -41,7 +41,7 @@ led_r = on
 
 srca = 0
 dsta = 8640
-set_position_a()
+set_vid2905()
 srca = 0
 dsta = 0
 
@@ -59,7 +59,7 @@ led_r = off
 ------------------------------------------------------------------------------------------------------------------------
 forever loop 
     
-    adjust_position_a()
+    adjust_vid2905()
     request_bootloader("asi_0007")
 
     cf = get_can_frame(id_lamps_0_31)
@@ -97,7 +97,7 @@ forever loop
             dsta = 12048
         end if
 
-        set_position_a()
+        set_vid2905()
 
 	end if
 
