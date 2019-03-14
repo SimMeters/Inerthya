@@ -40,9 +40,9 @@ led_l = on
 led_r = on
 
 srca = 0
-dsta = 6480
+dsta = 8640
 set_vid2905()
-srca = 6480
+srca = 8640
 dsta = 0
 set_vid2905()
 srca = 0
@@ -80,13 +80,13 @@ forever loop
       if (vvi <= float(0)) then
         dsta = 0
       elsif (vvi > float(0) & vvi <= float(20)) then
-        dsta = dword((vvi * float(324))
+        dsta = dword(vvi * float(324))
       elsif (vvi > float(20)) then
         dsta = 6480
       end if
 
       set_vid2905()
 
-	end if
+    end if
 
 end loop
