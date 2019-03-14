@@ -72,7 +72,7 @@ forever loop
     
     end if
     
-	  cf = get_can_frame(id_altitude_rate)
+    cf = get_can_frame(id_altitude_rate)
     if(cf.dlc > 0) then
     
       vvi = ((get_can_float(cf) * float(1.9438)) + float(10)) -- Vertical Speed m/s to Knots
