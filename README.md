@@ -1,7 +1,7 @@
 # Inerthya
 Simmeters Inerthya System
 
-If you use Java version please use OpenJDK you can download it from here https://jdk.java.net/archive/
+If you use Java version of Workspace, please use OpenJDK you can download it from here https://jdk.java.net/archive/
 
 SimMeters Inerthya System is a distributed communication system to manage the creation of entire simulation hardware environment, this includes gauges, panels, actuators displays, and so much devices.
 
