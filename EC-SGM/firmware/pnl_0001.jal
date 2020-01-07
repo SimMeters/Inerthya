@@ -1,0 +1,119 @@
+------------------------------------------------------------------------------------------------------------------------
+-- Copyright (c) 2015, SimMeters.
+-- All rights reserved. Released under the BSD license.
+-- pnl_0001.jal 1.0 01/01/2015 (Switch and Lights LRU Control)
+
+-- Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
+-- following conditions are met:
+
+-- 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the
+-- following disclaimer.
+
+-- 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+-- following disclaimer in the documentation and/or other materials provided with the distribution.
+
+-- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+-- INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+-- DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+-- SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+-- SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+-- WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+-- USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+------------------------------------------------------------------------------------------------------------------------
+include atachapters
+include canaerospace
+include lru0000
+include canbus
+include objects
+
+------------------------------------------------------------------------------------------------------------------------
+-- Variables Declaration
+------------------------------------------------------------------------------------------------------------------------
+var can_frame 	cf
+var dword 		lamps_0_31
+
+------------------------------------------------------------------------------------------------------------------------
+-- Initialization
+------------------------------------------------------------------------------------------------------------------------
+_usec_delay(1000000)
+
+setup_can_init()
+add_can_rxfilter(id_request_bootloader)
+add_can_rxfilter(id_lamps_0_31)
+setup_can_end()
+
+set_pin(p36, high)
+_usec_delay(500000)
+set_pin(p35, high)
+_usec_delay(500000)
+set_pin(p34, high)
+_usec_delay(500000)
+set_pin(p33, high)
+_usec_delay(500000)
+set_pin(p32, high)
+_usec_delay(500000)
+set_pin(p31, high)
+_usec_delay(500000)
+set_pin(p30, high)
+_usec_delay(500000)
+set_pin(p29, high)
+_usec_delay(1000000)
+
+set_pin(p36, low)
+set_pin(p35, low)
+set_pin(p34, low)
+set_pin(p33, low)
+set_pin(p32, low)
+set_pin(p31, low)
+set_pin(p30, low)
+set_pin(p29, low)
+
+set_pin(p21, high)
+set_pin(p22, low)
+
+------------------------------------------------------------------------------------------------------------------------
+-- Objects Definition
+------------------------------------------------------------------------------------------------------------------------
+var volatile sw2p sw1 = new_sw2p(p07, p19, 0xA1000001, 0xA1000000) -- SW1 : ON / OFF
+var volatile sw2p sw2 = new_sw2p(p08, p19, 0xA2000001, 0xA2000000) -- SW2 : ON / OFF
+var volatile sw2p sw3 = new_sw2p(p09, p19, 0xA3000001, 0xA3000000) -- SW3 : ON / OFF
+var volatile sw2p sw4 = new_sw2p(p10, p19, 0xA4000001, 0xA4000000) -- SW4 : ON / OFF
+var volatile sw2p sw5 = new_sw2p(p11, p19, 0xA5000001, 0xA5000000) -- SW5 : ON / OFF
+var volatile sw2p sw6 = new_sw2p(p12, p19, 0xA6000001, 0xA6000000) -- SW6 : ON / OFF
+var volatile sw2p sw7 = new_sw2p(p13, p19, 0xA7000001, 0xA7000000) -- SW7 : ON / OFF
+var volatile sw2p sw8 = new_sw2p(p14, p19, 0xA8000001, 0xA8000000) -- SW8 : ON / OFF
+
+------------------------------------------------------------------------------------------------------------------------
+-- Main Loop
+------------------------------------------------------------------------------------------------------------------------
+forever loop
+
+    request_bootloader("pnl_0001")
+    
+    cf = get_can_frame(id_lamps_0_31)
+    if(cf.dlc > 0) then
+
+        lamps_0_31 = get_can_uint32(cf)
+		var byte bdata[4] at lamps_0_31
+		
+		set_pin(36, byte(bdata[0] & 0b00000010)) -- LT1
+		set_pin(35, byte(bdata[0] & 0b00000100)) -- LT2
+		set_pin(34, byte(bdata[0] & 0b00001000)) -- LT3
+		set_pin(33, byte(bdata[0] & 0b00010000)) -- LT4
+		set_pin(32, byte(bdata[0] & 0b00100000)) -- LT5
+		set_pin(31, byte(bdata[0] & 0b01000000)) -- LT6
+		set_pin(30, byte(bdata[0] & 0b10000000)) -- LT7
+		set_pin(29, byte(bdata[1] & 0b00000001)) -- LT8
+
+    end if
+	
+	process_sw2p(sw1)
+    process_sw2p(sw2)
+    process_sw2p(sw3)
+    process_sw2p(sw4)
+    process_sw2p(sw5)
+    process_sw2p(sw6)
+    process_sw2p(sw7)
+    process_sw2p(sw8)
+
+end loop
