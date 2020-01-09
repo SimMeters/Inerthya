@@ -41,10 +41,10 @@ led_l = on
 led_r = on
 
 srca = 0
-dsta = 7680 -- BKA30-R5
+dsta = 7680 --BKA30-R5
 set_vid2905()
 
-srca = 7680 -- BKA30-R5
+srca = 7680 --BKA30-R5
 dsta = 0
 set_vid2905()
 
