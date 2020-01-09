@@ -41,10 +41,10 @@ led_l = on
 led_r = on
 
 srca = 0
-dsta = 7560
+dsta = 7680 -- BKA30-R5
 set_vid2905()
 
-srca = 7560
+srca = 7680 -- BKA30-R5
 dsta = 0
 set_vid2905()
 
@@ -87,7 +87,7 @@ forever loop
             dsta = 0
         elsif (asi > float(0) & asi <= float(40)) then
             dsta = dword(asi * float(16.8))
-        elsif (asi > float(40) & asi <= float(2200)) then
+        elsif (asi > float(40) & asi <= float(220)) then
             dsta = dword(672 + ((asi - 40) * float(38.26)))
         elsif (asi > float(220)) then
             dsta = 7560
