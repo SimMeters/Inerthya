@@ -31,13 +31,11 @@ socket = require("socket")
 
 con = socket.try(socket.udp())
 socket.try(con:settimeout(.001))
---socket.try(con:setpeername("192.168.1.100", 6060))
-socket.try(con:setpeername("172.16.1.100", 6060))
+socket.try(con:setpeername("192.168.1.134", 6060))
 
-aux = socket.try(socket.udp())
-socket.try(aux:settimeout(.001))
+--aux = socket.try(socket.udp())
+--socket.try(aux:settimeout(.001))
 --socket.try(aux:setpeername("192.168.1.146", 6060))
-socket.try(aux:setpeername("127.0.0.1", 6060))
 
 ------------------------------------------------------------------------------------------------------------------------
 -- Input Devices
@@ -126,7 +124,7 @@ function loop()
 
 	-- Airspeed Indicator CANAerospace knots to m/s units
 	table.insert(flightData,string.format("ID_INDICATED_AIRSPEED=%.4f", get("sim/cockpit2/gauges/indicators/airspeed_kts_pilot") * 0.5144))
-	draw_string(10, 10, get("sim/cockpit2/gauges/indicators/airspeed_kts_pilot") * 0.5144, "red")
+
 	-- Flaps 
  	table.insert(flightData,string.format("ID_FLAPS_LEVER_POSITION=%.4f", get("sim/flightmodel2/wing/flap1_deg")))
 
@@ -144,7 +142,7 @@ function loop()
 	
 	-- Roll
 	table.insert(flightData,string.format("ID_BODY_ROLL_ANGLE=%.4f",get("sim/cockpit/gyros/phi_ind_deg3")))
-
+	
 	-- Heading
 	table.insert(flightData,string.format("ID_HEADING_ANGLE=%.4f", get("sim/cockpit2/gauges/indicators/heading_electric_deg_mag_pilot")))
 
@@ -154,6 +152,51 @@ function loop()
 	-- CRS
 	table.insert(flightData,string.format("ID_SELECTED_COURSE=%.4f", get("sim/cockpit2/radios/actuators/hsi_obs_deg_mag_pilot")))
 
+	-- VOR1 BRG
+	table.insert(flightData,string.format("ID_VOR_1_RADIAL=%.4f", get("sim/cockpit2/radios/indicators/nav1_bearing_deg_mag")))
+	
+	-- VOR1 FREQUENCY
+	table.insert(flightData,string.format("ID_VOR_ILS_1_FREQUENCY=%.4f", get("sim/cockpit/radios/nav1_freq_hz")/100))
+	
+	-- VOR2 BRG
+	table.insert(flightData,string.format("ID_VOR_2_RADIAL=%.4f", get("sim/cockpit2/radios/indicators/nav2_bearing_deg_mag")))
+	
+	-- VOR2 FREQUENCY
+	table.insert(flightData,string.format("ID_VOR_ILS_2_FREQUENCY=%.4f", get("sim/cockpit/radios/nav2_freq_hz")/100))
+	
+	-- DME1 Distance NM to Mts
+	table.insert(flightData,string.format("ID_DME_1_DISTANCE=%.4f", get("sim/cockpit/radios/nav1_dme_dist_m") * 1852))
+
+	-- DME1 Gnd Speed Kts to m/s
+	table.insert(flightData,string.format("ID_DME_1_GROUND_SPEED=%.4f", get("sim/cockpit/radios/nav1_dme_speed_kts") * 0.514444))
+	
+	-- Gnd Speed m/s
+	table.insert(flightData,string.format("ID_GPS_GROUND_SPEED=%.4f", get("sim/flightmodel/position/groundspeed")))
+	
+	-- ADF1 BRG
+	table.insert(flightData,string.format("ID_ADF_1_BEARING=%.4f", get("sim/cockpit2/radios/indicators/adf1_bearing_deg_mag")))
+	
+	-- ADF1 FREQUENCY
+	table.insert(flightData,string.format("ID_ADF_1_FREQUENCY=%.4f", get("sim/cockpit/radios/adf1_freq_hz")))
+
+	-- ADF2 BRG
+	table.insert(flightData,string.format("ID_ADF_2_BEARING=%.4f", get("sim/cockpit2/radios/indicators/adf2_bearing_deg_mag")))
+	
+	-- ADF2 FREQUENCY
+	table.insert(flightData,string.format("ID_ADF_2_FREQUENCY=%.4f", get("sim/cockpit/radios/adf2_freq_hz")))
+
+	-- GLIDESLOPE DEFLECTION +-100 
+	table.insert(flightData,string.format("ID_ILS_1_GLIDESLOPE_DEVIATION=%.4f", get("sim/cockpit/radios/nav1_vdef_dot")*100))
+
+	-- LATITUDE
+	table.insert(flightData,string.format("ID_INS_AIRCRAFT_LATITUDE=%.8f", get("sim/flightmodel/position/latitude")))
+
+	-- LONGITUDE
+	table.insert(flightData,string.format("ID_INS_AIRCRAFT_LONGITUDE=%.8f", get("sim/flightmodel/position/longitude")))
+
+	--sim/cockpit/radios/com1_freq_hz	int	y	10Hz	The current frequency of the copm1 radio.
+	--sim/cockpit/radios/com2_freq_hz	int	y	10Hz	The current frequency of the com2 radio.
+	
 	-- Turn and Slip CANAerospace from -1 to +1
 	table.insert(flightData,string.format("ID_BODY_SIDESLIP=%.4f", get("sim/cockpit2/gauges/indicators/slip_deg") * -0.25))	
 	table.insert(flightData,string.format("ID_TURN_COORDINATION_RATE=%.4f", get("sim/cockpit2/gauges/indicators/turn_rate_heading_deg_pilot") * 0.03))
@@ -196,23 +239,23 @@ function loop()
 	0,																-- 15 
 	0,																-- 16 
 
-	0,																-- 17 
-	0,																-- 18 
-	0,																-- 19 
-	0,																-- 20 
-	0,																-- 21 
-	0,																-- 22 
-	0,																-- 23 
-	0,																-- 24 
+	1,																-- 17 EADI flag_fd
+	1,																-- 18 EADI flag_ap
+	1,																-- 19 EADI flag_hdg
+	1,																-- 20 EADI flag_vs
+	1,																-- 21 EADI flag_alt
+	1,																-- 22 EADI flag_loc
+	1,																-- 23 EADI resv
+	1,																-- 24 EADI resv
 
-	0,																-- 25 
-	0,																-- 26 
-	0,																-- 27 
-	0,																-- 28 
-	0,																-- 29 
-	0,																-- 30 
-	0,																-- 31 
-	0 																-- 32 
+	1,																-- 25 EHSI flag_vor1
+	0,																-- 26 EHSI flag_vor2
+	1,																-- 27 EHSI flag_dme1
+	1,																-- 28 EHSI flag_adf1
+	0,																-- 29 EHSI flag_adf2
+	1,																-- 30 EHSI flag_gs
+	0,																-- 31 EHSI flag_to_from
+	0 																-- 32 EHSI resv
 	}
 
 	table.insert(flightData,string.format("ID_LAMPS_0_31=%u", (lp[32] * (2^31) + lp[31] * (2^30) + lp[30] * (2^29) + lp[29] * (2^28) + lp[28] * (2^27) + lp[27] * (2^26) + lp[26] * (2^25) + lp[25] * (2^24) + lp[24] * (2^23) + lp[23] * (2^22) + lp[22] * (2^21) + lp[21] * (2^20) + lp[20] * (2^19) + lp[19] * (2^18) + lp[18] * (2^17) + lp[17] * (2^16) + lp[16] * (2^15) + lp[15] * (2^14) + lp[14] * (2^13) + lp[13] * (2^12) + lp[12] * (2^11) + lp[11] * (2^10) + lp[10] * (2^9) + lp[9] * (2^8) + lp[8] * (2^7) + lp[7] * (2^6) + lp[6] * (2^5) + lp[5] * (2^4) + lp[4] * (2^3) + lp[3] * (2^2) + lp[2] * (2^1) + lp[1])))
@@ -222,7 +265,7 @@ function loop()
 ------------------------------------------------------------------------------------------------------------------------
 	for i = 1, #flightData do packet = packet .. flightData[i] .. ";" end
 	socket.try(con:send(string.upper(packet)))
-	socket.try(aux:send(string.upper(packet)))
+	--socket.try(aux:send(string.upper(packet)))
 	
 ------------------------------------------------------------------------------------------------------------------------
 -- RX Data
