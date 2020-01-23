@@ -40,35 +40,16 @@ socket.try(con:setpeername("192.168.1.134", 6060))
 ------------------------------------------------------------------------------------------------------------------------
 -- Input Devices
 ------------------------------------------------------------------------------------------------------------------------
---canOpsTable[0xAA000001] = function() set("sim/cockpit/electrical/avionics_on", 0) 						end -- MASTER AVIONICS OFF
---canOpsTable[0xAA000000] = function() set("sim/cockpit/electrical/avionics_on", 1) 						end -- MASTER AVIONICS ON
---canOpsTable[0xAA000101] = function() set("sim/cockpit/electrical/beacon_lights_on", 0) 					end -- BEACON/STROBE OFF
---canOpsTable[0xAA000100] = function() set("sim/cockpit/electrical/beacon_lights_on", 1) 					end -- BEACON/STROBE ON
---canOpsTable[0xAA000201] = function() set("sim/cockpit2/engine/actuators/fuel_pump_on", 0) 				end -- PUMP OFF
---canOpsTable[0xAA000200] = function() set("sim/cockpit2/engine/actuators/fuel_pump_on", 1) 				end -- PUMP ON
---canOpsTable[0xAA000301] = function() set_array("sim/cockpit/electrical/generator_on", 0, 0) 				end -- ALTERNATOR OFF
---canOpsTable[0xAA000300] = function() set_array("sim/cockpit/electrical/generator_on", 0, 1) 				end -- ALTERNATOR ON
---canOpsTable[0xAA000401] = function() set("sim/cockpit2/switches/clutch_engage", 0) 						end -- CLUTCH OFF
---canOpsTable[0xAA000400] = function() set("sim/cockpit2/switches/clutch_engage", 1) 						end -- CLUTCH ON
---canOpsTable[0xAA000501] = function() set("sim/cockpit2/switches/navigation_lights_on", 0) 				end -- NAV LIGHTS OFF
---canOpsTable[0xAA000500] = function() set("sim/cockpit2/switches/navigation_lights_on", 1) 				end -- NAV LIGHTS ON
---canOpsTable[0xAA000601] = function() set("sim/cockpit2/switches/landing_lights_on", 0) 					end -- LANDING LIGHTS OFF
---canOpsTable[0xAA000600] = function() set("sim/cockpit2/switches/landing_lights_on", 1) 					end -- LANDING LIGHTS ON
---canOpsTable[0xAA000701] = function() set_array("sim/cockpit2/engine/actuators/carb_heat_ratio",0, 0.0) 	end -- CARBURATOR COLD
---canOpsTable[0xAA000700] = function() set_array("sim/cockpit2/engine/actuators/carb_heat_ratio",0, 1.0) 	end -- CARBURATOR HOT
---canOpsTable[0x220A0801] = function() set("sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot", get("sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot") - 0.01) end -- QNH_DEC
---canOpsTable[0x220A0802] = function() set("sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot", get("sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot") + 0.01) end -- QNH_INC
-
-canOpsTable[0xA1000000] = function() set("sim/cockpit/electrical/avionics_on", 0) 			end -- SW1 OFF
-canOpsTable[0xA1000001] = function() set("sim/cockpit/electrical/avionics_on", 1) 			end -- SW1 ON
-canOpsTable[0xA2000000] = function() set("sim/cockpit/electrical/beacon_lights_on", 0) 		end -- SW2 OFF
-canOpsTable[0xA2000001] = function() set("sim/cockpit/electrical/beacon_lights_on", 1) 		end -- SW2 ON
-canOpsTable[0xA3000000] = function() set("sim/cockpit2/engine/actuators/fuel_pump_on", 0) 	end -- SW3 OFF
-canOpsTable[0xA3000001] = function() set("sim/cockpit2/engine/actuators/fuel_pump_on", 1) 	end -- SW3 ON
-canOpsTable[0xA4000000] = function() end -- SW4 OFF
-canOpsTable[0xA4000001] = function() end -- SW4 ON
-canOpsTable[0xA5000000] = function() end -- SW5 OFF
-canOpsTable[0xA5000001] = function() end -- SW5 ON
+canOpsTable[0xA1000000] = function() set("sim/cockpit/electrical/avionics_on", 0) 	    end -- SW1 OFF
+canOpsTable[0xA1000001] = function() set("sim/cockpit/electrical/avionics_on", 1) 	    end -- SW1 ON
+canOpsTable[0xA2000000] = function() set("sim/cockpit/electrical/beacon_lights_on", 0) 	    end -- SW2 OFF
+canOpsTable[0xA2000001] = function() set("sim/cockpit/electrical/beacon_lights_on", 1) 	    end -- SW2 ON
+canOpsTable[0xA3000000] = function() set("sim/cockpit2/engine/actuators/fuel_pump_on", 0)   end -- SW3 OFF
+canOpsTable[0xA3000001] = function() set("sim/cockpit2/engine/actuators/fuel_pump_on", 1)   end -- SW3 ON
+canOpsTable[0xA4000000] = function() set("sim/cockpit2/switches/navigation_lights_on", 0)   end -- SW4 OFF
+canOpsTable[0xA4000001] = function() set("sim/cockpit2/switches/navigation_lights_on", 1)   end -- SW4 ON
+canOpsTable[0xA5000000] = function() set("sim/cockpit2/switches/landing_lights_on", 0)      end -- SW5 OFF
+canOpsTable[0xA5000001] = function() set("sim/cockpit2/switches/landing_lights_on", 1)      end -- SW5 ON
 canOpsTable[0xA6000000] = function() end -- SW6 OFF
 canOpsTable[0xA6000001] = function() end -- SW6 ON
 canOpsTable[0xA7000000] = function() end -- SW7 OFF
@@ -140,8 +121,17 @@ function loop()
 	-- Pitch
 	table.insert(flightData,string.format("ID_BODY_PITCH_ANGLE=%.4f",get("sim/cockpit/gyros/the_ind_deg3")))
 	
+	-- FD Pitch
+	table.insert(flightData,string.format("ID_FLIGHT_DIRECTOR_1_PITCH_DEVIATION=%.4f",get("sim/cockpit/autopilot/flight_director_pitch")/2))
+
 	-- Roll
 	table.insert(flightData,string.format("ID_BODY_ROLL_ANGLE=%.4f",get("sim/cockpit/gyros/phi_ind_deg3")))
+
+	-- FD Roll
+	table.insert(flightData,string.format("ID_FLIGHT_DIRECTOR_1_ROLL_DEVIATION=%.4f",get("sim/cockpit/autopilot/flight_director_roll")))
+	
+	-- DH
+	table.insert(flightData,string.format("ID_DECISION_HEIGHT=%.4f",get("sim/cockpit/misc/radio_altimeter_minimum")))
 	
 	-- Heading
 	table.insert(flightData,string.format("ID_HEADING_ANGLE=%.4f", get("sim/cockpit2/gauges/indicators/heading_electric_deg_mag_pilot")))
@@ -185,6 +175,9 @@ function loop()
 	-- ADF2 FREQUENCY
 	table.insert(flightData,string.format("ID_ADF_2_FREQUENCY=%.4f", get("sim/cockpit/radios/adf2_freq_hz")))
 
+	-- LOCALIZER DEFLECTION +-100 
+	table.insert(flightData,string.format("ID_ILS_1_LOCALIZE_DEVIATION=%.4f", get("sim/cockpit/radios/nav1_hdef_dot")*100))
+	
 	-- GLIDESLOPE DEFLECTION +-100 
 	table.insert(flightData,string.format("ID_ILS_1_GLIDESLOPE_DEVIATION=%.4f", get("sim/cockpit/radios/nav1_vdef_dot")*100))
 
@@ -194,11 +187,14 @@ function loop()
 	-- LONGITUDE
 	table.insert(flightData,string.format("ID_INS_AIRCRAFT_LONGITUDE=%.8f", get("sim/flightmodel/position/longitude")))
 
-	--sim/cockpit/radios/com1_freq_hz	int	y	10Hz	The current frequency of the copm1 radio.
-	--sim/cockpit/radios/com2_freq_hz	int	y	10Hz	The current frequency of the com2 radio.
+	-- COM1 Frequency
+	table.insert(flightData,string.format("ID_VHF_1_COM_FREQUENCY=%.8f", get("sim/cockpit/radios/com1_freq_hz")/100))
+
+	-- COM2 Frequency
+	table.insert(flightData,string.format("ID_VHF_2_COM_FREQUENCY=%.8f", get("sim/cockpit/radios/com2_freq_hz")/100))
 	
 	-- Turn and Slip CANAerospace from -1 to +1
-	table.insert(flightData,string.format("ID_BODY_SIDESLIP=%.4f", get("sim/cockpit2/gauges/indicators/slip_deg") * -0.25))	
+	table.insert(flightData,string.format("ID_BODY_SIDESLIP=%.4f", get("sim/cockpit2/gauges/indicators/slip_deg") * -100))	
 	table.insert(flightData,string.format("ID_TURN_COORDINATION_RATE=%.4f", get("sim/cockpit2/gauges/indicators/turn_rate_heading_deg_pilot") * 0.03))
 	
 	-- Temperature K
@@ -216,46 +212,71 @@ function loop()
 	-- OIL Pressure hPa
 	table.insert(flightData,string.format("ID_ENGINE_1_OIL_PRESSURE_ECS_CHANNEL_A=%.4f", get("sim/cockpit2/engine/indicators/oil_pressure_psi", 0) * 68.9475))
  	table.insert(flightData,string.format("ID_ENGINE_2_OIL_PRESSURE_ECS_CHANNEL_A=%.4f", get("sim/cockpit2/engine/indicators/oil_pressure_psi", 1) * 68.9475))
-	
-	--draw_string(10, 10, get("sim/cockpit2/switches/panel_brightness_ratio", 0), "red")
 
 	-- LAMPS_0_31
+
+	flag_fd = 0
+	flag_ap = 0
+	var = get("sim/cockpit2/autopilot/flight_director_mode")
+	if (var > 0)  then flag_fd = 1 end
+	if (var == 2) then flag_ap = 1 end
+	
+	flag_hdg = 0
+	var = get("sim/cockpit2/autopilot/heading_mode")
+	if(var == 1) then flag_hdg = 1 end
+
+	flag_vs  = 0
+	flag_alt = 0
+	var = get("sim/cockpit2/autopilot/altitude_mode")
+	if (var == 4) then flag_vs  = 1 end
+	if (var == 6) then flag_alt = 1 end
+	
+	flag_loc = 0
+	var = get("sim/cockpit/radios/nav1_hdef_dot")
+	if(var ~= 0) then flag_loc = 1 end
+
+	flag_gs = 0
+	var = get("sim/cockpit/radios/nav1_vdef_dot")
+	if(var ~= 0) then flag_gs = 1 end
+	
+	--draw_string(10, 10, var, "red")
+
 	lp = { 
 	1,																-- 1 LT0 GAUGES LIGHTS
 	get("sim/cockpit/warnings/annunciators/master_warning"), 		-- 2 LT1 
 	get("sim/cockpit/warnings/annunciators/master_caution"),		-- 3 LT2
-	get("sim/cockpit/warnings/annunciators/autopilot_disconnect"),	-- 4 LT3
+	get("sim/cockpit/warnings/annunciators/autopilot_disconnect"),		-- 4 LT3
 	get("sim/cockpit/warnings/annunciators/low_vacuum"),			-- 5 LT4
 	get("sim/cockpit/warnings/annunciators/low_voltage"),			-- 6 LT5
 	get("sim/cockpit/warnings/annunciators/fuel_quantity"),			-- 7 LT6
-	get("sim/cockpit/warnings/annunciators/hydraulic_pressure"),	-- 8 LT7
+	get("sim/cockpit/warnings/annunciators/hydraulic_pressure"),		-- 8 LT7
 
 	get("sim/cockpit/warnings/annunciators/speedbrake"),			-- 9  LT8
 	math.floor(get("sim/flightmodel2/gear/deploy_ratio", 0)),		-- 10 LEFT
 	math.floor(get("sim/flightmodel2/gear/deploy_ratio", 1)),		-- 11 NOSE
 	math.floor(get("sim/flightmodel2/gear/deploy_ratio", 2)),		-- 12 RIGHT
-	0,																-- 13 
-	0,																-- 14 
-	0,																-- 15 
-	0,																-- 16 
+	0,									-- 13 
+	0,									-- 14 
+	0,									-- 15 
+	0,									-- 16 
 
-	1,																-- 17 EADI flag_fd
-	1,																-- 18 EADI flag_ap
-	1,																-- 19 EADI flag_hdg
-	1,																-- 20 EADI flag_vs
-	1,																-- 21 EADI flag_alt
-	1,																-- 22 EADI flag_loc
-	1,																-- 23 EADI resv
-	1,																-- 24 EADI resv
+	flag_fd,								-- 17 EADI flag_fd
+	flag_ap,								-- 18 EADI flag_ap
+	flag_hdg,								-- 19 EADI flag_hdg
+	flag_vs,								-- 20 EADI flag_vs
+	flag_alt,								-- 21 EADI flag_alt
+	flag_loc,								-- 22 EADI flag_loc
+	1,									-- 23 EADI resv
+	1,									-- 24 EADI resv
 
-	1,																-- 25 EHSI flag_vor1
-	0,																-- 26 EHSI flag_vor2
-	1,																-- 27 EHSI flag_dme1
-	1,																-- 28 EHSI flag_adf1
-	0,																-- 29 EHSI flag_adf2
-	1,																-- 30 EHSI flag_gs
-	0,																-- 31 EHSI flag_to_from
-	0 																-- 32 EHSI resv
+	1,									-- 25 EHSI flag_vor1
+	0,									-- 26 EHSI flag_vor2
+	1,									-- 27 EHSI flag_dme1
+	1,									-- 28 EHSI flag_adf1
+	0,									-- 29 EHSI flag_adf2
+	flag_gs,								-- 30 EHSI flag_gs
+	0,									-- 31 EHSI flag_to_from
+	0 									-- 32 EHSI resv
 	}
 
 	table.insert(flightData,string.format("ID_LAMPS_0_31=%u", (lp[32] * (2^31) + lp[31] * (2^30) + lp[30] * (2^29) + lp[29] * (2^28) + lp[28] * (2^27) + lp[27] * (2^26) + lp[26] * (2^25) + lp[25] * (2^24) + lp[24] * (2^23) + lp[23] * (2^22) + lp[22] * (2^21) + lp[21] * (2^20) + lp[20] * (2^19) + lp[19] * (2^18) + lp[18] * (2^17) + lp[17] * (2^16) + lp[16] * (2^15) + lp[15] * (2^14) + lp[14] * (2^13) + lp[13] * (2^12) + lp[12] * (2^11) + lp[11] * (2^10) + lp[10] * (2^9) + lp[9] * (2^8) + lp[8] * (2^7) + lp[7] * (2^6) + lp[6] * (2^5) + lp[5] * (2^4) + lp[4] * (2^3) + lp[3] * (2^2) + lp[2] * (2^1) + lp[1])))
