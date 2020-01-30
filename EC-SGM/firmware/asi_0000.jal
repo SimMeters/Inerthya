@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------------------------------------------------
 -- Copyright (c) 2015, SimMeters
 -- All rights reserved. Released under the BSD license.
--- asi_0000.jal 1.0 01/01/2015 (Indicated Airspeed 0-220 Knots & MPH 80MM AZ)
+-- asi_0000.jal 1.0 01/01/2015 (Digital / Analog Airspeed - Mach Indicator 0-1000 Knots)
 
 -- Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
 -- following conditions are met:
@@ -24,13 +24,17 @@ include atachapters     -- Library constants ATA Chapters
 include canaerospace    -- Constants for CANAerospace
 include lru0180         -- Include For LRU Gauge Device Type
 include canbus          -- CanBus Library
+include sgcdisplay      -- 4DSystems Display Library
 
 ------------------------------------------------------------------------------------------------------------------------
 -- Variables Declaration
 ------------------------------------------------------------------------------------------------------------------------
 var can_frame 	cf
 var dword 		lamps_0_31
-var float 		asi = 0.0
+var float 		mac   = 0.0
+var dword 		vmac  = 0
+var dword 		vmacl = 0
+var float 		asi   = 0.0
 
 ------------------------------------------------------------------------------------------------------------------------
 -- Initialization
@@ -40,11 +44,23 @@ _usec_delay(1000000)
 led_l = on
 led_r = on
 
+LATC_LATC4 = low
+_usec_delay(100000)
+LATC_LATC4 = high
+_usec_delay(1000000)
+
+usart_enable()
+set_autobaud()
+clear_screen()
+
+print_mach (0x05, 0x04, 0x02, 0xFF, 0xFF, dword(mac))
+print_asi  (0x05, 0x05, 0x01, 0xFF, 0xFF, dword(asi))
+
 srca = 0
-dsta = 7680 --BKA30-R5
+dsta = 7680
 set_vid2905()
 
-srca = 7680 --BKA30-R5
+srca = 7680
 dsta = 0
 set_vid2905()
 
@@ -54,6 +70,7 @@ dsta = 0
 setup_can_init()
 add_can_rxfilter(id_request_bootloader)
 add_can_rxfilter(id_lamps_0_31)
+add_can_rxfilter(id_mach_number)
 add_can_rxfilter(id_indicated_airspeed)
 setup_can_end()
 
@@ -65,6 +82,7 @@ led_r = off
 ------------------------------------------------------------------------------------------------------------------------
 forever loop 
     
+    opaque_text(true)
     request_bootloader("asi_0000")
 
     cf = get_can_frame(id_lamps_0_31)
@@ -77,24 +95,36 @@ forever loop
         led_r = byte(bdata[0] & 0b00000001) 
     
     end if
+
+    cf = get_can_frame(id_mach_number)
+    if(cf.dlc > 0) then
+
+         mac = get_can_float(cf) * float(100)
+         vmac = dword(mac)
+
+         if(vmac != vmacl) then
+
+			vmacl = vmac
+            print_mach(0x05, 0x04, 0x01, 0xFF, 0xFF, vmac)
+         
+		 end if
+
+    end if    
     
 	cf = get_can_frame(id_indicated_airspeed)
     if(cf.dlc > 0) then
     
-        asi = get_can_float(cf) * float(1.9438) -- m/s to knots
+        asi = get_can_float(cf) * float(1.94384) -- ms to knots
 
-		if (asi <= float(0)) then
-            dsta = 0
-        elsif (asi > float(0) & asi <= float(40)) then
-            dsta = dword(asi * float(16.8))
-        elsif (asi > float(40) & asi <= float(220)) then
-            dsta = dword(672 + ((asi - 40) * float(38.26)))
-        elsif (asi > float(220)) then
-            dsta = 7560
+        if (asi >= float(0) & asi <= float(1000)) then
+        
+            dsta = dword(asi * float(7.68))
+            set_vid2905()
+
         end if
 
-        set_vid2905()
+        print_asi(0x05, 0x05, 0x01, 0xFF, 0xFF, dword(asi))
 
-	end if
+    end if    
 
 end loop
