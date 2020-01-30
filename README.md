@@ -13,4 +13,6 @@ We have two types of packet DOP and DIP (Data Output / Data Input packets) with 
 
 The system works over UDP connection on the port 6060 and the format of the UDP packets are described on inerthya.lua file insde of the wrappers folder.
 
+Test UDP packets on UDP wrapper with echo command line;
 
+echo 'ID_MACH_NUMBER=1.20;ID_INDICATED_AIRSPEED=350.00;' > /dev/udp/127.0.0.1/6060
