@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------------------------------------------------
 -- Copyright(c) 2016, SimMeters.com
 -- All rights reserved. Released under the BSD license.
--- inerthya.lua 1.0 01/01/2016 (INERTHYA Protocol LUA Implementation)
+-- Inerthya.lua 1.0 01/01/2016 (INERTHYA Protocol LUA Implementation)
 
 -- Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
 -- following conditions are met:
@@ -37,58 +37,58 @@
 -- CAN Aerospace V1.7 Constants and Functions
 -- CAN Aerospace V1.7 NODES
 ------------------------------------------------------------------------------------------------------------------------
-NODE_AHRS	= 0x01
-NODE_ADC	= 0x02
-NODE_VHF1	= 0x03
-NODE_VHF2 	= 0x04
+NODE_AHRS		= 0x01
+NODE_ADC		= 0x02
+NODE_VHF1		= 0x03
+NODE_VHF2		= 0x04
 NODE_NAVILS1	= 0x05
 NODE_NAVILS2	= 0x06
-NODE_ATC	= 0x07
-NODE_ADF	= 0x08
-NODE_GPS	= 0x0A
-NODE_DME	= 0x0B
-NODE_EMS	= 0x0C
-NODE_ETS	= 0x0D
-NODE_ES		= 0x0E
-NODE_WCS	= 0x0F
+NODE_ATC		= 0x07
+NODE_ADF		= 0x08
+NODE_GPS		= 0x0A
+NODE_DME		= 0x0B
+NODE_EMS		= 0x0C
+NODE_ETS		= 0x0D
+NODE_ES			= 0x0E
+NODE_WCS		= 0x0F
 
 ------------------------------------------------------------------------------------------------------------------------
 -- CAN Aerospace V1.7 DATA TYPES
 ------------------------------------------------------------------------------------------------------------------------
-TYPE_NODATA	= 0x00
-TYPE_ERROR	= 0x01
-TYPE_FLOAT	= 0x02
-TYPE_LONG	= 0x03
-TYPE_ULONG	= 0x04
-TYPE_BLONG	= 0x05
-TYPE_SHORT	= 0x06
-TYPE_USHORT	= 0x07
-TYPE_BSHORT	= 0x08
-TYPE_CHAR	= 0x09
-TYPE_UCHAR	= 0x0A
-TYPE_BCHAR	= 0x0B
+TYPE_NODATA		= 0x00
+TYPE_ERROR		= 0x01
+TYPE_FLOAT		= 0x02
+TYPE_LONG		= 0x03
+TYPE_ULONG		= 0x04
+TYPE_BLONG		= 0x05
+TYPE_SHORT		= 0x06
+TYPE_USHORT		= 0x07
+TYPE_BSHORT		= 0x08
+TYPE_CHAR		= 0x09
+TYPE_UCHAR		= 0x0A
+TYPE_BCHAR		= 0x0B
 TYPE_SHORT2     = 0x0C
 TYPE_USHORT2    = 0x0D
 TYPE_BSHORT2    = 0x0E
-TYPE_CHAR4	= 0x0F
+TYPE_CHAR4		= 0x0F
 TYPE_UCHAR4     = 0x10
 TYPE_BCHAR4     = 0x11
-TYPE_CHAR2	= 0x12
+TYPE_CHAR2		= 0x12
 TYPE_UCHAR2     = 0x13
 TYPE_BCHAR2     = 0x14
-TYPE_MEMID	= 0x15
+TYPE_MEMID		= 0x15
 TYPE_CHKSUM     = 0x16
-TYPE_ACHAR	= 0x17
+TYPE_ACHAR		= 0x17
 TYPE_ACHAR2     = 0x18
 TYPE_ACHAR4     = 0x19
-TYPE_CHAR3	= 0x1A
+TYPE_CHAR3		= 0x1A
 TYPE_UCHAR3     = 0x1B
 TYPE_BCHAR3     = 0x1C
 TYPE_ACHAR3     = 0x1D
 TYPE_DOUBLEH    = 0x1E
 TYPE_DOUBLEL    = 0x1F
-TYPE_RESVD	= 0x20
-TYPE_UDEF	= 0x64
+TYPE_RESVD		= 0x20
+TYPE_UDEF		= 0x64
 
 ------------------------------------------------------------------------------------------------------------------------
 -- CAN Aerospace V1.7 SERVICE CODES
@@ -274,9 +274,9 @@ CA_ENGINE_2_INTER_TURBINE_TEMPERATURE_ECS_CHANNEL_B		= 581
 CA_ENGINE_3_INTER_TURBINE_TEMPERATURE_ECS_CHANNEL_B		= 582
 CA_ENGINE_4_INTER_TURBINE_TEMPERATURE_ECS_CHANNEL_B		= 583
 CA_ENGINE_1_TURBINE_OUTLET_TEMPERATURE_ECS_CHANNEL_B	= 584
-ID_ENGINE_2_TURBINE_OUTLET_TEMPERATURE_ECS_CHANNEL_B    = 585
-ID_ENGINE_3_TURBINE_OUTLET_TEMPERATURE_ECS_CHANNEL_B    = 586
-ID_ENGINE_4_TURBINE_OUTLET_TEMPERATURE_ECS_CHANNEL_B    = 587
+CA_ENGINE_2_TURBINE_OUTLET_TEMPERATURE_ECS_CHANNEL_B    = 585
+CA_ENGINE_3_TURBINE_OUTLET_TEMPERATURE_ECS_CHANNEL_B    = 586
+CA_ENGINE_4_TURBINE_OUTLET_TEMPERATURE_ECS_CHANNEL_B    = 587
 CA_ENGINE_1_FUEL_FLOW_RATE_ECS_CHANNEL_B 				= 588
 CA_ENGINE_2_FUEL_FLOW_RATE_ECS_CHANNEL_B 				= 589
 CA_ENGINE_3_FUEL_FLOW_RATE_ECS_CHANNEL_B 				= 590
@@ -461,7 +461,7 @@ CA_PROP_9_ICEGUARD_DC_CURRENT 							= 948
 CA_PROP_10_ICEGUARD_DC_CURRENT 							= 949
 CA_ACTIVE_NAV_SYSTEM_WAYPOINT_LATITUDE 					= 1000
 CA_ACTIVE_NAV_SYSTEM_WAYPOINT_LONGITUDE 				= 1001
-ID_ACTIVE_NAV_SYSTEM_WAYPOINT_HEIGHT_ABOVE_ELLIPSOID    = 1002
+CA_ACTIVE_NAV_SYSTEM_WAYPOINT_HEIGHT_ABOVE_ELLIPSOID    = 1002
 CA_ACTIVE_NAV_SYSTEM_WAYPOINT_ALTITUDE 					= 1003
 CA_ACTIVE_NAV_SYSTEM_GROUND_SPEED 						= 1004
 CA_ACTIVE_NAV_SYSTEM_TRUE_TRACK 						= 1005
